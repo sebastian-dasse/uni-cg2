@@ -4,10 +4,9 @@
  *
  * Module: parametric_curve
  *
- * A Circle knows how to draw itself into a specified 2D context,
- * can tell whether a certain mouse position "hits" the object,
- * and implements the function createDraggers() to create a set of
- * draggers to manipulate itself.
+ * A Parametric curve knows how to draw itself into a specified 2D context
+ * and can tell whether a certain mouse position "hits" the object.
+ * The function createDraggers() returns an empty list.
  *
  */
 
@@ -34,26 +33,14 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
         
         // draw style for drawing the circle
         this.lineStyle = lineStyle || { width: "2", color: "#0000AA" };
-
-        // // exception handling for eval()
-        // var tryEval = function(t, formula) {
-        //     var res;
-        //     try {
-        //         res = eval(formula);
-        //     } catch(err) {
-        //         console.log(err);
-        //     }
-        //     return res;
-        // };
-
-        // this.x = function(t) { return tryEval(t, x_formula); };
-        // this.y = function(t) { return tryEval(t, y_formula); };
         
         this.x_formula = x_formula;
         this.y_formula = y_formula;
 
-        this.x = function(t) { return tryEval(t, x_formula); };
-        this.y = function(t) { return tryEval(t, y_formula); };
+        // this.x = function(t) { return tryEval(t, x_formula); };
+        // this.y = function(t) { return tryEval(t, y_formula); };
+        this.x = function(t) { return eval(x_formula); };
+        this.y = function(t) { return eval(y_formula); };
 
         this.t_min = t_min;
         this.t_max = t_max;
@@ -64,6 +51,8 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
         this.calculatePoints();
     };
 
+    ParametricCurve.MAX_SEGMENTS =  1000;
+
     // exception handling for eval()
     var tryEval = function(t, formula) {
         try {
@@ -71,6 +60,19 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
         } catch(err) {
             console.log(err);
         }
+    };
+
+    var isValidFormula = function(formula) {
+        try {
+            var t = 1;
+            if (!isFinite(eval(formula))) {
+                throw new Error();
+            }
+        } catch(err) {
+            console.log("\'" + formula + "\' is not a valid formula");
+            return false;
+        }
+        return true;
     };
 
     ParametricCurve.prototype.calculatePoints = function() {
@@ -84,13 +86,15 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
 
     ParametricCurve.prototype.setX = function(x_formula) {
         this.x_formula = x_formula;
-        this.x = function(t) { return tryEval(t, x_formula); };
+        // this.x = function(t) { return tryEval(t, x_formula); };
+        this.x = function(t) { return eval(x_formula); };
         this.calculatePoints();
     };
 
     ParametricCurve.prototype.setY = function(y_formula) {
         this.y_formula = y_formula;
-        this.y = function(t) { return tryEval(t, y_formula); };
+        // this.y = function(t) { return tryEval(t, y_formula); };
+        this.y = function(t) { return eval(y_formula); };
         this.calculatePoints();
     };
 

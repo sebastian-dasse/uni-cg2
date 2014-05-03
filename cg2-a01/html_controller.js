@@ -113,7 +113,17 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
                 color: randomColor()
             };
 
-            var parametricCurve = new ParametricCurve( "350+100*Math.sin(t)", "150+100*Math.cos(t)", 0, 5, 20, style);
+            // var parametricCurve = new ParametricCurve("350+100*Math.sin(t)", "150+100*Math.cos(t)", 0, 5, 20, style);
+            var x = $("#inputX").val();
+            var y = $("#inputY").val();
+            var t_min = $("#inputMinT").val();
+            var t_max = $("#inputMaxT").val();
+            var segments = $("#inputSegments").val();
+            if (x && y && t_min && t_max && segments) {
+                console.log("success");
+            }
+
+            var parametricCurve = new ParametricCurve(x, y, t_min, t_max, segments, style);
             scene.addObjects([parametricCurve]);
 
             sceneController.deselect();
@@ -125,12 +135,12 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
          */
         $("#inputLineColor").change(function(evt) {
             var obj = sceneController.getSelectedObject();
-            var newColor = evt.currentTarget.value;
+            if (!obj) { return; };
 
-            if (newColor.match(/^#[0-9a-f]{6}$/i)) {
+            var newColor = evt.currentTarget.value;
+            if (obj && newColor.match(/^#[0-9a-f]{6}$/i)) {
                 obj.lineStyle.color = newColor;
             }
-            
             sceneController.select(obj);
         });
 
@@ -139,10 +149,13 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
          */
         $("#inputLineWidth").change(function(evt) {
             var obj = sceneController.getSelectedObject();
-            var newWidth = parseInt(evt.currentTarget.value);
-            var isInRange = newWidth && 1 <= newWidth && newWidth <= 5;
+            if (!obj) { return; };
 
-            if (isInRange) {
+            var MIN_WIDTH = 1;
+            var MAX_WIDTH = 5;
+
+            var newWidth = parseInt(evt.currentTarget.value);
+            if (newWidth && MIN_WIDTH <= newWidth && newWidth <= MAX_WIDTH) {
                 obj.lineStyle.width = newWidth;
             }
             sceneController.select(obj);
@@ -153,24 +166,39 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
          */
         $("#inputRadius").change(function(evt) {
             var obj = sceneController.getSelectedObject();
+
+            var MAX_RADIUS = 250;
+
             var newRadius = parseInt(evt.currentTarget.value);
-            var isInRange = newRadius && 1 <= newRadius && newRadius <= 250; // context.canvas.width / 2 == 250
-            
-            if (isInRange) {
+            if (newRadius && 1 <= newRadius && newRadius <= MAX_RADIUS) { // context.canvas.width / 2 == 250
                 obj.setRadius(newRadius);
             }
             sceneController.select(obj);
         });
+
+        var isValidFormula = function(formula) {
+            try {
+                var t = 1;
+                if (!isFinite(eval(formula))) {
+                    throw new Error();
+                }
+            } catch(err) {
+                console.log("\'" + formula + "\' is not a valid formula");
+                return false;
+            }
+            return true;
+        };
 
         /*
          * TODO: Dok it!
          */
         $("#inputX").change(function(evt) {
             var obj = sceneController.getSelectedObject();
-            
-            // if (obj && obj.setX) { //                << TODO: FRAGE: was ist die bessere Alternative ???
-            if (obj instanceof ParametricCurve) {
-                obj.setX($("#inputX").val());
+            if (!obj) { return; };
+
+            var newVal = $("#inputX").val();
+            if (obj instanceof ParametricCurve && isValidFormula(newVal)) {
+                obj.setX(newVal);
             }
             sceneController.select(obj);
         });
@@ -180,8 +208,11 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
          */
         $("#inputY").change(function(evt) {
             var obj = sceneController.getSelectedObject();
-            if (obj instanceof ParametricCurve) {
-                obj.setY($("#inputY").val());
+            if (!obj) { return; };
+
+            var newVal = $("#inputY").val();
+            if (obj && obj instanceof ParametricCurve && isValidFormula(newVal)) {
+                obj.setY(newVal);
             }
             sceneController.select(obj);
         });
@@ -191,8 +222,10 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
          */
         $("#inputMinT").change(function(evt) {
             var obj = sceneController.getSelectedObject();
-            var newVal = $("#inputMinT").val();
-            if (obj instanceof ParametricCurve && newVal.match(/^[+-]?[0-9]+\.?[0-9]*$/i)) {
+            if (!obj) { return; };
+
+            var newVal = parseFloat($("#inputMinT").val());
+            if (obj instanceof ParametricCurve && !isNaN(newVal)) {
                 obj.setTMin(newVal);
             }
             sceneController.select(obj);
@@ -203,8 +236,10 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
          */
         $("#inputMaxT").change(function(evt) {
             var obj = sceneController.getSelectedObject();
-            var newVal = $("#inputMaxT").val();
-            if (obj instanceof ParametricCurve && newVal.match(/^[+-]?[0-9]+\.?[0-9]*$/i)) {
+            if (!obj) { return; };
+
+            var newVal = parseFloat($("#inputMaxT").val());
+            if (obj instanceof ParametricCurve && !isNaN(newVal)) {
                 obj.setTMax(newVal);
             }
             sceneController.select(obj);
@@ -215,8 +250,10 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
          */
         $("#inputSegments").change(function(evt) {
             var obj = sceneController.getSelectedObject();
-            var newVal = $("#inputSegments").val();
-            if (obj instanceof ParametricCurve && newVal.match(/^[0-9]+$/i)) {
+            if (!obj) { return; };
+
+            var newVal = parseInt($("#inputSegments").val());
+            if (obj instanceof ParametricCurve && 1 <= newVal && newVal < ParametricCurve.MAX_SEGMENTS) {
                 obj.setSegments(newVal);
             }
             sceneController.select(obj);
