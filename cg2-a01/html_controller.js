@@ -191,8 +191,9 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
          */
         $("#inputMinT").change(function(evt) {
             var obj = sceneController.getSelectedObject();
-            if (obj instanceof ParametricCurve) {
-                obj.setTMin($("#inputMinT").val());
+            var newVal = $("#inputMinT").val();
+            if (obj instanceof ParametricCurve && newVal.match(/^[+-]?[0-9]+\.?[0-9]*$/i)) {
+                obj.setTMin(newVal);
             }
             sceneController.select(obj);
         });
@@ -202,8 +203,9 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
          */
         $("#inputMaxT").change(function(evt) {
             var obj = sceneController.getSelectedObject();
-            if (obj instanceof ParametricCurve) {
-                obj.setTMax($("#inputMaxT").val());
+            var newVal = $("#inputMaxT").val();
+            if (obj instanceof ParametricCurve && newVal.match(/^[+-]?[0-9]+\.?[0-9]*$/i)) {
+                obj.setTMax(newVal);
             }
             sceneController.select(obj);
         });
@@ -213,8 +215,9 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
          */
         $("#inputSegments").change(function(evt) {
             var obj = sceneController.getSelectedObject();
-            if (obj instanceof ParametricCurve) {
-                obj.setSegments($("#inputSegments").val());
+            var newVal = $("#inputSegments").val();
+            if (obj instanceof ParametricCurve && newVal.match(/^[0-9]+$/i)) {
+                obj.setSegments(newVal);
             }
             sceneController.select(obj);
         });
