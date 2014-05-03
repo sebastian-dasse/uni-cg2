@@ -34,46 +34,34 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
         // draw style for drawing the circle
         this.lineStyle = lineStyle || { width: "2", color: "#0000AA" };
         
-        this.x_formula = x_formula;
-        this.y_formula = y_formula;
+        this.x_formula = x_formula || "100*t";
+        this.y_formula = y_formula || "200+100*Math.sin(t)";
+        this.t_min = t_min || 0;
+        this.t_max = t_max || 2 * Math.PI;
+        this.segments = segments || 20;
 
         // this.x = function(t) { return tryEval(t, x_formula); };
         // this.y = function(t) { return tryEval(t, y_formula); };
-        this.x = function(t) { return eval(x_formula); };
-        this.y = function(t) { return eval(y_formula); };
-
-        this.t_min = t_min;
-        this.t_max = t_max;
-        this.segments = segments;
+        this.x = function(t) { return eval(this.x_formula); };
+        this.y = function(t) { return eval(this.y_formula); };
+        console.log("\'" + this.x +"\'");
+        console.log("\'" + this.y +"\'");
 
         // the points for the approximated parametric curve
         this.p = [];
         this.calculatePoints();
     };
 
-    ParametricCurve.MAX_SEGMENTS =  1000;
+    ParametricCurve.MAX_SEGMENTS =  10000;
 
     // exception handling for eval()
-    var tryEval = function(t, formula) {
-        try {
-            return eval(formula);
-        } catch(err) {
-            console.log(err);
-        }
-    };
-
-    var isValidFormula = function(formula) {
-        try {
-            var t = 1;
-            if (!isFinite(eval(formula))) {
-                throw new Error();
-            }
-        } catch(err) {
-            console.log("\'" + formula + "\' is not a valid formula");
-            return false;
-        }
-        return true;
-    };
+    // var tryEval = function(t, formula) {
+    //     try {
+    //         return eval(formula);
+    //     } catch(err) {
+    //         console.log(err);
+    //     }
+    // };
 
     ParametricCurve.prototype.calculatePoints = function() {
         this.p = [];

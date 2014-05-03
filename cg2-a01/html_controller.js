@@ -113,15 +113,11 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
                 color: randomColor()
             };
 
-            // var parametricCurve = new ParametricCurve("350+100*Math.sin(t)", "150+100*Math.cos(t)", 0, 5, 20, style);
             var x = $("#inputX").val();
             var y = $("#inputY").val();
             var t_min = $("#inputMinT").val();
             var t_max = $("#inputMaxT").val();
             var segments = $("#inputSegments").val();
-            if (x && y && t_min && t_max && segments) {
-                console.log("success");
-            }
 
             var parametricCurve = new ParametricCurve(x, y, t_min, t_max, segments, style);
             scene.addObjects([parametricCurve]);
@@ -253,7 +249,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
             if (!obj) { return; };
 
             var newVal = parseInt($("#inputSegments").val());
-            if (obj instanceof ParametricCurve && 1 <= newVal && newVal < ParametricCurve.MAX_SEGMENTS) {
+            if (obj instanceof ParametricCurve && 1 <= newVal && newVal <= ParametricCurve.MAX_SEGMENTS) {
                 obj.setSegments(newVal);
             }
             sceneController.select(obj);
