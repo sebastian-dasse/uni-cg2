@@ -44,15 +44,13 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
         // this.y = function(t) { return tryEval(t, y_formula); };
         this.x = function(t) { return eval(this.x_formula); };
         this.y = function(t) { return eval(this.y_formula); };
-        console.log("\'" + this.x +"\'");
-        console.log("\'" + this.y +"\'");
 
         // the points for the approximated parametric curve
         this.p = [];
         this.calculatePoints();
     };
 
-    ParametricCurve.MAX_SEGMENTS =  10000;
+    ParametricCurve.MAX_SEGMENTS =  5000;
 
     // exception handling for eval()
     // var tryEval = function(t, formula) {
