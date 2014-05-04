@@ -82,7 +82,7 @@ define(["jquery", "gl-matrix", "util",
             return function() {
                 var obj = sceneController.getSelectedObject();
                 var style = obj.lineStyle;
-                
+
                 $("#inputLineColor").val(style.color);
                 $("#inputLineWidth").val(style.width);
 
@@ -109,6 +109,7 @@ define(["jquery", "gl-matrix", "util",
                 if (obj.segments) {
                     $("#inputSegments").val(obj.segments);
                 }
+
             };
         };
 

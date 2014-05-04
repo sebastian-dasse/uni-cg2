@@ -59,6 +59,16 @@ define([],
         return t;
                 
     };
+
+    // returns a normal to the given vector
+    vec2.normalTo = function(v) {
+        return [v[1], -v[0]];
+    }
+
+    // returns the normalized vector, i.e. with the same direction, but with length 1
+    vec2.normalized = function(v) {
+        return vec2.mult(v, 1.0/vec2.length(v));
+    }
     
     // this module exports an object defining a number of functions
     return vec2;

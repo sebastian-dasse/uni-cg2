@@ -119,7 +119,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"]
             var t_max = $("#inputTMax").val();
             var segments = $("#inputSegments").val();
 
-            var parametricCurve = new ParametricCurve(x, y, t_min, t_max, segments, style);
+            var parametricCurve = new ParametricCurve(scene, x, y, t_min, t_max, segments, style);
             scene.addObjects([parametricCurve]);
 
             sceneController.deselect();
@@ -137,9 +137,9 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"]
             // };
 
             // var segments = $("#inputSegments").val();
-            
-            // var bezierCurve = new BezierCurve(segments, style);
-            var bezierCurve = new BezierCurve();
+
+            // var bezierCurve = new BezierCurve(scene, segments, style);
+            var bezierCurve = new BezierCurve(scene);
             scene.addObjects([bezierCurve]);
 
             sceneController.deselect();
@@ -151,10 +151,10 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"]
          */
         $("#inputLineColor").change(function(evt) {
             var obj = sceneController.getSelectedObject();
-            if (!obj) { return; };
+            if (!obj) { return; }
 
             var newColor = evt.currentTarget.value;
-            if (obj && newColor.match(/^#[0-9a-f]{6}$/i)) {
+            if (newColor.match(/^#[0-9a-f]{6}$/i)) {
                 obj.lineStyle.color = newColor;
             }
             sceneController.select(obj);
@@ -165,7 +165,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"]
          */
         $("#inputLineWidth").change(function(evt) {
             var obj = sceneController.getSelectedObject();
-            if (!obj) { return; };
+            if (!obj) { return; }
 
             var MIN_WIDTH = 1;
             var MAX_WIDTH = 5;
@@ -192,31 +192,28 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"]
             sceneController.select(obj);
         });
 
-        // checks formula given as a string for validity, i.e. that it can be evaluated to finite numbers
-        var isValidFormula = function(formula) {
-            try {
-                var t = 1;
-                if (!isFinite(eval(formula))) {
-                    throw new Error();
-                }
-            } catch(err) {
-                console.log("\'" + formula + "\' is not a valid formula");
-                return false;
-            }
-            return true;
-        };
+        // // checks formula given as a string for validity, i.e. that it can be evaluated to finite numbers
+        // var isValidFormula = function(formula) {
+        //     try {
+        //         var t = 1;
+        //         if (!isFinite(eval(formula))) {
+        //             throw new Error();
+        //         }
+        //     } catch(err) {
+        //         console.log("\'" + formula + "\' is not a valid formula");
+        //         return false;
+        //     }
+        //     return true;
+        // };
 
         /*
          * TODO: Dok it!
          */
         $("#inputX").change(function(evt) {
             var obj = sceneController.getSelectedObject();
-            if (!obj) { return; };
-
-            var newVal = $("#inputX").val();
-            if (obj instanceof ParametricCurve && isValidFormula(newVal)) {
-                obj.setX(newVal);
-            }
+            if (!obj) { return; }
+            
+            obj.setX($("#inputX").val());
             sceneController.select(obj);
         });
         
@@ -225,12 +222,9 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"]
          */
         $("#inputY").change(function(evt) {
             var obj = sceneController.getSelectedObject();
-            if (!obj) { return; };
-
-            var newVal = $("#inputY").val();
-            if (obj && obj instanceof ParametricCurve && isValidFormula(newVal)) {
-                obj.setY(newVal);
-            }
+            if (!obj) { return; }
+            
+            obj.setY($("#inputY").val());
             sceneController.select(obj);
         });
 
@@ -239,14 +233,11 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"]
          */
         $("#inputTMin").change(function(evt) {
             var obj = sceneController.getSelectedObject();
-            if (!obj) { return; };
+            if (!obj) { return; }
 
             var newVal = parseFloat($("#inputTMin").val());
-            // if (obj instanceof ParametricCurve && !isNaN(newVal)) {
             if (obj.setTMin && !isNaN(newVal)) {
                 obj.setTMin(newVal);
-            } else {
-                console.log(obj);
             }
             sceneController.select(obj);
         });
@@ -259,7 +250,6 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"]
             if (!obj) { return; };
 
             var newVal = parseFloat($("#inputTMax").val());
-            // if (obj instanceof ParametricCurve && !isNaN(newVal)) {
             if (obj.setTMax && !isNaN(newVal)) {
                 obj.setTMax(newVal);
             }
@@ -274,11 +264,20 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"]
             if (!obj) { return; };
 
             var newVal = parseInt($("#inputSegments").val());
-            // if (obj instanceof ParametricCurve && 1 <= newVal && newVal <= ParametricCurve.MAX_SEGMENTS) {
             if (obj.setSegments && 1 <= newVal && newVal <= ParametricCurve.MAX_SEGMENTS) {
                 obj.setSegments(newVal);
             }
             sceneController.select(obj);
+        });
+
+        /*
+         * TODO: Dok it!
+         */
+        $("#inputTickMarks").change(function(evt) {
+            scene.ticksOn = !scene.ticksOn;
+            
+            var obj = sceneController.getSelectedObject();
+            obj && sceneController.select(obj);
         });
         
     

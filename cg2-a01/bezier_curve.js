@@ -36,7 +36,7 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
     var b3 = "t*t*t";
 
     // var BezierCurve = function(p0, p1, p2, p3, segments, lineStyle) {
-    var BezierCurve = function(segments, lineStyle) {
+    var BezierCurve = function(scene, segments, lineStyle) {
         
         // draw style for drawing the circle
         this.lineStyle = lineStyle || { width: "2", color: "#0000AA" };
@@ -49,6 +49,7 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         this.p2 = [ 0 *200 + 250, -1 *100 + 200];
         this.p3 = [ 1 *200 + 250,  0 *100 + 200];
 
+        this.scene = scene;
         this.x_formula;
         this.y_formula;
 
@@ -72,8 +73,8 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
                          b2 + "*" + this.p2[1] + " + " + 
                          b3 + "*" + this.p3[1];
         
-        // this.curve = new ParametricCurve(this.x_formula, this.y_formula, 0, 1, this.segments, this.lineStyle);
-        this.curve = new ParametricCurve(this.x_formula, this.y_formula, this.t_min, this.t_max, this.segments, this.lineStyle);
+        // this.curve = new ParametricCurve(this.scene, this.x_formula, this.y_formula, 0, 1, this.segments, this.lineStyle);
+        this.curve = new ParametricCurve(this.scene, this.x_formula, this.y_formula, this.t_min, this.t_max, this.segments, this.lineStyle);
     }
 
     // set the control point p0
@@ -120,6 +121,11 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         this.update();
     };
 
+    // turn the tick marks on or off
+    // BezierCurve.prototype.toggleTicks = function() {
+    //     this.curve.toggleTicks();
+    // };
+
     // draw this circle into the provided 2D rendering context
     BezierCurve.prototype.draw = function(context) {
         this.curve.draw(context);
@@ -134,6 +140,7 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
     BezierCurve.prototype.createDraggers = function() {
         
         var draggerStyle = { radius:4, color: this.lineStyle.color, width:0, fill:true }
+        var draggerStyle2 = { radius:4, color: this.lineStyle.color, width:0, fill:false }
         var draggers = [];
         
         // create closure and callbacks for dragger
@@ -150,8 +157,8 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         draggers.push( new PolygonDragger(getP0, getP1, getP2, getP3) );
 
         draggers.push( new PointDragger(getP0, setP0, draggerStyle) );
-        draggers.push( new PointDragger(getP1, setP1, draggerStyle) );
-        draggers.push( new PointDragger(getP2, setP2, draggerStyle) );
+        draggers.push( new PointDragger(getP1, setP1, draggerStyle2) );
+        draggers.push( new PointDragger(getP2, setP2, draggerStyle2) );
         draggers.push( new PointDragger(getP3, setP3, draggerStyle) );
 
         

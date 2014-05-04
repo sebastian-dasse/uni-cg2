@@ -55,7 +55,7 @@ define(["util", "scene"],
         // default draw style for the dragger
         this.drawStyle = {};
         this.drawStyle.width = 1;
-        this.drawStyle.color = "#ff0000";
+        this.drawStyle.color = "#999999";
         
         // attribute queried by SceneController to recognize draggers
         this.isDragger = true; 

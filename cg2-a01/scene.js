@@ -29,6 +29,9 @@ define(["util"],
 
         // list of objects that can be drawn 
         this.drawableObjects = [];
+
+        // show tick marks or not?
+        this.ticksOn = false;
         
     };
 

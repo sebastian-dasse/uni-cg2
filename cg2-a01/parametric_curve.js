@@ -29,13 +29,18 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
      *       begin of the form { width: 2, color: "#00FF00" }
      */ 
 
-    var ParametricCurve = function(x_formula, y_formula, t_min, t_max, segments, lineStyle) {
+    var ParametricCurve = function(scene, x_formula, y_formula, t_min, t_max, segments, lineStyle) {
         
         // draw style for drawing the circle
         this.lineStyle = lineStyle || { width: "2", color: "#0000AA" };
         
-        this.x_formula = x_formula || "100*t";
-        this.y_formula = y_formula || "200+100*Math.sin(t)";
+        this.scene = scene;
+        // this.x_formula = x_formula || "100*t";
+        // this.y_formula = y_formula || "200+100*Math.sin(t)";
+
+        this.x_formula = isValidFormula(x_formula) && x_formula || "100*t";
+        this.y_formula = isValidFormula(y_formula) && y_formula || "200+100*Math.sin(t)";
+        
         this.t_min = t_min || 0;
         this.t_max = t_max || 2 * Math.PI;
         this.segments = segments || 20;
@@ -70,13 +75,17 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
 
     // set the formula for the x component
     ParametricCurve.prototype.setX = function(x_formula) {
-        this.x_formula = x_formula;
+        if (isValidFormula(x_formula)) {
+            this.x_formula = x_formula;
+        }
         this.update();
     };
 
     // set the formula for the y component
     ParametricCurve.prototype.setY = function(y_formula) {
-        this.y_formula = y_formula;
+        if (isValidFormula(y_formula)) {
+            this.y_formula = y_formula;
+        }
         this.update();
     };
 
@@ -98,6 +107,12 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
         this.update();
     };
 
+    // turn the tick marks on or off
+    // ParametricCurve.prototype.toggleTicks = function() {
+    //     this.ticksOn = !this.ticksOn;
+    //     this.update();
+    // };
+
     // draw this circle into the provided 2D rendering context
     ParametricCurve.prototype.draw = function(context) {
 
@@ -113,6 +128,45 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
         context.strokeStyle = this.lineStyle.color;
         
         // actually start drawing
+        context.stroke();
+
+        if (this.scene.ticksOn) {
+            this.drawTicks(context);
+        }
+    };
+
+    ParametricCurve.prototype.drawTicks = function(context) {
+
+        var TICK_SIZE = 5
+        var n = this.segments;
+        var p = this.p;
+
+        var drawTick = function(p, tangent) {
+            var tick = vec2.mult(vec2.normalized(vec2.normalTo(tangent)), TICK_SIZE);
+            var tp0 = vec2.add(p, tick);
+            var tp1 = vec2.add(p, vec2.mult(tick, -1));
+
+            context.moveTo(tp0[0], tp0[1]);
+            context.lineTo(tp1[0], tp1[1]);
+        };
+
+        context.beginPath();
+        
+        // first tick
+        drawTick(p[0], vec2.sub(p[1], p[0]));
+
+        // ticks from p[1] to p[n-1]
+        for (var i = 1; i < n; i++) {
+            drawTick(p[i], vec2.sub(p[i+1], p[i-1]));
+        }
+
+        // last tick
+        drawTick(p[n], vec2.sub(p[n], p[n-1]));
+
+        // set drawing style
+        context.lineWidth = 1;
+        context.strokeStyle = "#999999";
+
         context.stroke();
     };
 
@@ -130,6 +184,20 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
     // no draggers to manipulate this parametric curve
     ParametricCurve.prototype.createDraggers = function() {
         return [];
+    };
+
+    // checks formula given as a string for validity, i.e. that it can be evaluated to finite numbers
+    var isValidFormula = function(formula) {
+        try {
+            var t = 1;
+            if (!isFinite(eval(formula))) {
+                throw new Error();
+            }
+        } catch(err) {
+            console.log("\'" + formula + "\' is not a valid formula");
+            return false;
+        }
+        return true;
     };
     
     return ParametricCurve;
