@@ -41,6 +41,7 @@
         <button id="btnNewLine" type="button"   >New Line</button>
         <button id="btnNewCircle" type="button"   >New Circle</button>
         <button id="btnNewParametricCurve" type="button"   >New Parametric Curve</button>
+        <button id="btnNewBezierCurve" type="button"   >New Bezier Curve</button>
 
         <h3>Manipulate Objects:</h3>
 
@@ -63,11 +64,11 @@
                 <label for="inputY">y(t): </label>
                 <input id="inputY" type="text">
 
-                <label for="inputMinT">min t: </label>
-                <input id="inputMinT" type="number" step="any">
+                <label for="inputTMin">min t: </label>
+                <input id="inputTMin" type="number" step="any">
 
-                <label for="inputMaxT">max t: </label>
-                <input id="inputMaxT" type="number" step="any">
+                <label for="inputTMax">max t: </label>
+                <input id="inputTMax" type="number" step="any">
 
                 <label for="inputSegments">segments: </label>
                 <input id="inputSegments" type="number" min="0" max="5000" placeholder="0-5000">
@@ -75,11 +76,9 @@
                 <label for="inputTickMarks">tick marks: </label>
                 <input id="inputTickMarks" type="checkbox" align="left">
             </p>
-        </form>
-
-    </div>
+        </formBezierdiv>
     
-    <div style="float:clear;">
+    <div styleBezierfloat:clear;">
     </div>
     
   </div>

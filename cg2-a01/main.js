@@ -82,10 +82,11 @@ define(["jquery", "gl-matrix", "util",
             return function() {
                 var obj = sceneController.getSelectedObject();
                 var style = obj.lineStyle;
+                
                 $("#inputLineColor").val(style.color);
                 $("#inputLineWidth").val(style.width);
 
-                if (obj instanceof Circle) {
+                if (obj.getRadius) {
                     $("#inputAreaRadius").show();
                     $("#inputRadius").val(obj.getRadius());
                     sceneController.scene.draw(context);
@@ -93,20 +94,21 @@ define(["jquery", "gl-matrix", "util",
                     $("#inputAreaRadius").hide();
                 }
 
-                if (obj instanceof ParametricCurve) {
+                if (obj.x_formula) {
                     $("#inputX").val(obj.x_formula);
+                }
+                if (obj.y_formula) {
                     $("#inputY").val(obj.y_formula);
-                    $("#inputMinT").val(obj.t_min);
-                    $("#inputMaxT").val(obj.t_max);
+                }
+                if (obj.t_min !== undefined) {
+                    $("#inputTMin").val(obj.t_min);
+                }
+                if (obj.t_max !== undefined) {
+                    $("#inputTMax").val(obj.t_max);
+                }
+                if (obj.segments) {
                     $("#inputSegments").val(obj.segments);
                 }
-                //  else {
-                //     $("#inputX").val("");
-                //     $("#inputY").val("");
-                //     $("#inputMinT").val("");
-                //     $("#inputMaxT").val("");
-                //     $("#inputSegments").val("");
-                // }
             };
         };
 

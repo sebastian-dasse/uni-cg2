@@ -11,8 +11,8 @@
 
  
 /* requireJS module definition */
-define(["jquery", "straight_line", "circle", "parametric_curve"], 
-       (function($, StraightLine, Circle, ParametricCurve) {
+define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"], 
+       (function($, StraightLine, Circle, ParametricCurve, BezierCurve) {
 
     "use strict"; 
                 
@@ -115,8 +115,8 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
 
             var x = $("#inputX").val();
             var y = $("#inputY").val();
-            var t_min = $("#inputMinT").val();
-            var t_max = $("#inputMaxT").val();
+            var t_min = $("#inputTMin").val();
+            var t_max = $("#inputTMax").val();
             var segments = $("#inputSegments").val();
 
             var parametricCurve = new ParametricCurve(x, y, t_min, t_max, segments, style);
@@ -124,6 +124,26 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
 
             sceneController.deselect();
             sceneController.select(parametricCurve);
+        }));
+
+        /*
+         * TODO: Dok it!
+         */
+        $("#btnNewBezierCurve").click( (function() {
+
+            // var style = {
+            //     width: Math.floor(Math.random()*3)+1, 
+            //     color: randomColor()
+            // };
+
+            // var segments = $("#inputSegments").val();
+            
+            // var bezierCurve = new BezierCurve(segments, style);
+            var bezierCurve = new BezierCurve();
+            scene.addObjects([bezierCurve]);
+
+            sceneController.deselect();
+            sceneController.select(bezierCurve);
         }));
 
         /*
@@ -172,6 +192,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
             sceneController.select(obj);
         });
 
+        // checks formula given as a string for validity, i.e. that it can be evaluated to finite numbers
         var isValidFormula = function(formula) {
             try {
                 var t = 1;
@@ -216,13 +237,16 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
         /*
          * TODO: Dok it!
          */
-        $("#inputMinT").change(function(evt) {
+        $("#inputTMin").change(function(evt) {
             var obj = sceneController.getSelectedObject();
             if (!obj) { return; };
 
-            var newVal = parseFloat($("#inputMinT").val());
-            if (obj instanceof ParametricCurve && !isNaN(newVal)) {
+            var newVal = parseFloat($("#inputTMin").val());
+            // if (obj instanceof ParametricCurve && !isNaN(newVal)) {
+            if (obj.setTMin && !isNaN(newVal)) {
                 obj.setTMin(newVal);
+            } else {
+                console.log(obj);
             }
             sceneController.select(obj);
         });
@@ -230,12 +254,13 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
         /*
          * TODO: Dok it!
          */
-        $("#inputMaxT").change(function(evt) {
+        $("#inputTMax").change(function(evt) {
             var obj = sceneController.getSelectedObject();
             if (!obj) { return; };
 
-            var newVal = parseFloat($("#inputMaxT").val());
-            if (obj instanceof ParametricCurve && !isNaN(newVal)) {
+            var newVal = parseFloat($("#inputTMax").val());
+            // if (obj instanceof ParametricCurve && !isNaN(newVal)) {
+            if (obj.setTMax && !isNaN(newVal)) {
                 obj.setTMax(newVal);
             }
             sceneController.select(obj);
@@ -249,7 +274,8 @@ define(["jquery", "straight_line", "circle", "parametric_curve"],
             if (!obj) { return; };
 
             var newVal = parseInt($("#inputSegments").val());
-            if (obj instanceof ParametricCurve && 1 <= newVal && newVal <= ParametricCurve.MAX_SEGMENTS) {
+            // if (obj instanceof ParametricCurve && 1 <= newVal && newVal <= ParametricCurve.MAX_SEGMENTS) {
+            if (obj.setSegments && 1 <= newVal && newVal <= ParametricCurve.MAX_SEGMENTS) {
                 obj.setSegments(newVal);
             }
             sceneController.select(obj);

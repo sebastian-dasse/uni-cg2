@@ -18,12 +18,13 @@ define(["util", "vec2", "scene", "point_dragger"],
        
     "use strict";
 
-    /** TODO: Dok
-     *
-     *  A simple circle that can be dragged 
-     *  around by its endpoints.
+    /**
+     *  A simple circle that can be dragged around by its center point. The radius can be 
+     *  manipulated by dragging a second point, that lies on the circle.
      *  Parameters:
-     *  - point0 and point1: array objects representing [x,y] coordinates of start and end point
+     *  - center: an array object representing [x,y] coordinates of the center point
+     *  - radiusVec: an array object representing a 2D vector pointing from the center to a point
+     *          on the circle, thus a vector with length equal to the radius
      *  - lineStyle: object defining width and color attributes for line drawing, 
      *       begin of the form { width: 2, color: "#00FF00" }
      */ 
@@ -45,10 +46,12 @@ define(["util", "vec2", "scene", "point_dragger"],
         
     };
 
+    // returns the radius of this circle
     Circle.prototype.getRadius = function() {
         return Math.floor(vec2.length(this.radiusVec));
     }
 
+    // sets the radius of this circle
     Circle.prototype.setRadius = function(radius) {
         this.radiusVec = vec2.mult(this.radiusVec, radius / this.getRadius());
     }
@@ -82,20 +85,6 @@ define(["util", "vec2", "scene", "point_dragger"],
     
     // return list of draggers to manipulate this line
     Circle.prototype.createDraggers = function() {
-    
-
-
-        // TODO: Dok it! >>> in anderes Modulverschieben !!! >> wird nicht verwendet ???
-        var rotation = function(radians, s) {
-            return [Math.abs(s * Math.sin(radians)), Math.abs(s * Math.cos(radians))];
-        };
-
-        // TODO: Dok it! >>> in anderes Modulverschieben !!! >>
-        var angleBetween = function(v0, v1) {
-            return Math.acos(vec2.dot(v0, v1) / (vec2.length(v0) * vec2.length(v1)) );
-        };
-
-        
 
         var draggerStyle = { radius:4, color: this.lineStyle.color, width:0, fill:true };
         var draggers = [];

@@ -19,8 +19,7 @@ define(["util", "vec2", "scene", "point_dragger"],
     "use strict";
 
     /**
-     *  A simple straight line that can be dragged 
-     *  around by its endpoints.
+     *  A simple straight line that can be dragged around by its endpoints.
      *  Parameters:
      *  - point0 and point1: array objects representing [x,y] coordinates of start and end point
      *  - lineStyle: object defining width and color attributes for line drawing, 
