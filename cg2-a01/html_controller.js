@@ -192,20 +192,6 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"]
             sceneController.select(obj);
         });
 
-        // // checks formula given as a string for validity, i.e. that it can be evaluated to finite numbers
-        // var isValidFormula = function(formula) {
-        //     try {
-        //         var t = 1;
-        //         if (!isFinite(eval(formula))) {
-        //             throw new Error();
-        //         }
-        //     } catch(err) {
-        //         console.log("\'" + formula + "\' is not a valid formula");
-        //         return false;
-        //     }
-        //     return true;
-        // };
-
         /*
          * TODO: Dok it!
          */
@@ -279,8 +265,52 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"]
             var obj = sceneController.getSelectedObject();
             obj && sceneController.select(obj);
         });
+
+        // TODO: Dok it! >>>>>>>>>
+        var showParams = function() {
+            return function() {
+                var obj = sceneController.getSelectedObject();
+                var style = obj.lineStyle;
+
+                $("#inputLineColor").val(style.color);
+                $("#inputLineWidth").val(style.width);
+
+                if (obj.getRadius) {
+                    $("#inputAreaRadius").show();
+                    $("#inputRadius").val(obj.getRadius());
+                    sceneController.scene.draw(context);
+                } else {
+                    $("#inputAreaRadius").hide();
+                }
+
+                if (obj.x_formula) {
+                    $("#inputX").val(obj.x_formula);
+                }
+                if (obj.y_formula) {
+                    $("#inputY").val(obj.y_formula);
+                }
+                if (obj.t_min !== undefined) {
+                    $("#inputTMin").val(obj.t_min);
+                }
+                if (obj.t_max !== undefined) {
+                    $("#inputTMax").val(obj.t_max);
+                }
+                if (obj.segments) {
+                    $("#inputSegments").val(obj.segments);
+                }
+            };
+        };
+
+        // TODO: Dok it!
+        sceneController.onSelection(showParams());
+        sceneController.onObjChange(showParams());
+
+        /*
+         * TODO: Dok it!
+         */
+        $("#inputAreaRadius").hide();
         
-    
+
     };
 
     // return the constructor function 

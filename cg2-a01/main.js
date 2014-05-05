@@ -72,55 +72,10 @@ define(["jquery", "gl-matrix", "util",
         var sceneController = new SceneController(context,scene); 
         
         // callbacks for the various HTML elements (buttons, ...)
-        var htmlController = new HtmlController(context,scene,sceneController); 
+        var htmlController = new HtmlController(context,scene,sceneController);
         
         // draw scene initially
         scene.draw(context);
-
-        // TODO: Dok it! >>>>>>>>>
-        var showParams = function() {
-            return function() {
-                var obj = sceneController.getSelectedObject();
-                var style = obj.lineStyle;
-
-                $("#inputLineColor").val(style.color);
-                $("#inputLineWidth").val(style.width);
-
-                if (obj.getRadius) {
-                    $("#inputAreaRadius").show();
-                    $("#inputRadius").val(obj.getRadius());
-                    sceneController.scene.draw(context);
-                } else {
-                    $("#inputAreaRadius").hide();
-                }
-
-                if (obj.x_formula) {
-                    $("#inputX").val(obj.x_formula);
-                }
-                if (obj.y_formula) {
-                    $("#inputY").val(obj.y_formula);
-                }
-                if (obj.t_min !== undefined) {
-                    $("#inputTMin").val(obj.t_min);
-                }
-                if (obj.t_max !== undefined) {
-                    $("#inputTMax").val(obj.t_max);
-                }
-                if (obj.segments) {
-                    $("#inputSegments").val(obj.segments);
-                }
-
-            };
-        };
-
-        // TODO: Dok it!
-        sceneController.onSelection(showParams());
-        sceneController.onObjChange(showParams());
-
-        /*
-         * TODO: Dok it!
-         */
-        $("#inputAreaRadius").hide();
 
         
     })); // $(document).ready()
