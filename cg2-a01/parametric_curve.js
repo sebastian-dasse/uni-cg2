@@ -141,15 +141,15 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
         var p = this.p;
 
         // first tick
-        drawTick(p[0], vec2.sub(p[1], p[0]));
+        drawTick(context, p[0], vec2.sub(p[1], p[0]));
 
         // ticks from p[1] to p[n-1]
         for (var i = 1; i < n; i++) {
-            drawTick(p[i], vec2.sub(p[i+1], p[i-1]));
+            drawTick(context, p[i], vec2.sub(p[i+1], p[i-1]));
         }
 
         // last tick
-        drawTick(p[n], vec2.sub(p[n], p[n-1]));
+        drawTick(context, p[n], vec2.sub(p[n], p[n-1]));
     };
 
     // test whether the mouse position is on this parametric curve

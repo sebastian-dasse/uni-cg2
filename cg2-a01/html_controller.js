@@ -218,7 +218,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
             var obj = sceneController.getSelectedObject();
             if (!obj) { return; }
             
-            obj.setX($("#inputX").val());
+            obj.setX && obj.setX($("#inputX").val());
             sceneController.select(obj);
         });
         
@@ -229,7 +229,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
             var obj = sceneController.getSelectedObject();
             if (!obj) { return; }
             
-            obj.setY($("#inputY").val());
+            obj.setY && obj.setY($("#inputY").val());
             sceneController.select(obj);
         });
 
