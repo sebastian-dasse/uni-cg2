@@ -35,23 +35,22 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
         this.lineStyle = lineStyle || { width: "2", color: "#0000AA" };
         
         this.scene = scene;
-        // this.x_formula = x_formula || "100*t";
-        // this.y_formula = y_formula || "200+100*Math.sin(t)";
-
         this.x_formula = isValidFormula(x_formula) && x_formula || "100*t";
         this.y_formula = isValidFormula(y_formula) && y_formula || "200+100*Math.sin(t)";
-        
         this.t_min = t_min || 0;
         this.t_max = t_max || 2 * Math.PI;
         this.segments = segments || 20;
-
-        // the points for the approximated parametric curve
-        this.p = [];
+        this.p = [];    // the points for the approximated parametric curve
+        
+        // the lines for the approximated parametric curve - only used for isHit(), because drawing individual lines does not look so good
+        this.lines = [];
         
         // calculate the points for the curve
-        this.update();
+        this.calculate();
         
-        console.log("creating parametric curve [x: " + x_formula + ", y: " + y_formula + ", t_min: " + t_min + ", t_max: " + t_max + ", segments: " + segments + "].");
+        // console.log("creating parametric curve from [" + 
+        //             this.p[0][0] + "," + this.p[0][1] + "] to [" +
+        //             this.p[this.p.length-1][0] + "," + this.p[this.p.length-1][1] + "].");
     };
 
     /* the maximum number of segments */
@@ -64,12 +63,19 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
     ParametricCurve.prototype.y = function(t) { return eval(this.y_formula); };
 
     // calculate all points for this curve
-    ParametricCurve.prototype.update = function() {
+    ParametricCurve.prototype.calculate = function() {
         this.p = [];
+        this.lines = [];
         var delta = (this.t_max - this.t_min) / this.segments;
-        for (var i = 0; i <= this.segments; i++) {
+        
+        var p0 = [this.x(this.t_min), this.y(this.t_min)];
+        this.p.push(p0);
+        for (var i = 1; i <= this.segments; i++) {
             var t = this.t_min + i * delta;
-            this.p.push([this.x(t), this.y(t)]);
+            var p1 = [this.x(t), this.y(t)];
+            this.p.push(p1);
+            this.lines.push( new StraightLine(p0, p1, this.lineStyle) );
+            p0 = p1;
         }
     };
 
@@ -78,7 +84,7 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
         if (isValidFormula(x_formula)) {
             this.x_formula = x_formula;
         }
-        this.update();
+        this.calculate();
     };
 
     // set the formula for the y component
@@ -86,32 +92,26 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
         if (isValidFormula(y_formula)) {
             this.y_formula = y_formula;
         }
-        this.update();
+        this.calculate();
     };
 
     // set the minimum for t
     ParametricCurve.prototype.setTMin = function(t_min) {
         this.t_min = t_min;
-        this.update();
+        this.calculate();
     };
 
     // set the maximum for t
     ParametricCurve.prototype.setTMax = function(t_max) {
         this.t_max = t_max;
-        this.update();
+        this.calculate();
     };
 
     // set the number of segments
     ParametricCurve.prototype.setSegments = function(segments) {
         this.segments = segments;
-        this.update();
+        this.calculate();
     };
-
-    // turn the tick marks on or off
-    // ParametricCurve.prototype.toggleTicks = function() {
-    //     this.ticksOn = !this.ticksOn;
-    //     this.update();
-    // };
 
     // draw this circle into the provided 2D rendering context
     ParametricCurve.prototype.draw = function(context) {
@@ -135,23 +135,11 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
         }
     };
 
+    // draw tick marks for all points where the curve is being evaluated
     ParametricCurve.prototype.drawTicks = function(context) {
-
-        var TICK_SIZE = 5
         var n = this.segments;
         var p = this.p;
 
-        var drawTick = function(p, tangent) {
-            var tick = vec2.mult(vec2.normalized(vec2.normalTo(tangent)), TICK_SIZE);
-            var tp0 = vec2.add(p, tick);
-            var tp1 = vec2.add(p, vec2.mult(tick, -1));
-
-            context.moveTo(tp0[0], tp0[1]);
-            context.lineTo(tp1[0], tp1[1]);
-        };
-
-        context.beginPath();
-        
         // first tick
         drawTick(p[0], vec2.sub(p[1], p[0]));
 
@@ -162,19 +150,12 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
 
         // last tick
         drawTick(p[n], vec2.sub(p[n], p[n-1]));
-
-        // set drawing style
-        context.lineWidth = 1;
-        context.strokeStyle = "#999999";
-
-        context.stroke();
     };
 
     // test whether the mouse position is on this parametric curve
     ParametricCurve.prototype.isHit = function(context,pos) {
-        for (var i = 0; i < this.segments; i++) {
-            var line = new StraightLine(this.p[i], this.p[i+1], this.lineStyle);
-            if (line.isHit(context, pos)) {
+        for (var i = 0; i < this.lines.length; i++) {
+            if (this.lines[i].isHit(context, pos)) {
                 return true;
             }
         }
@@ -198,6 +179,22 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
             return false;
         }
         return true;
+    };
+
+    // draw one single tick through the given point, orthogonal to the given tagent
+    var drawTick = function(context, p, tangent) {
+        var TICK_SIZE = 5;
+        var tick = vec2.mult(vec2.normalized(vec2.normalTo(tangent)), TICK_SIZE);
+        var tp0 = vec2.add(p, tick);
+        var tp1 = vec2.add(p, vec2.mult(tick, -1));
+
+        context.beginPath();
+        context.moveTo(tp0[0], tp0[1]);
+        context.lineTo(tp1[0], tp1[1]);
+
+        context.lineWidth = 1;
+        context.strokeStyle = "#999999";
+        context.stroke();
     };
     
     return ParametricCurve;

@@ -44,13 +44,16 @@ define(["util", "scene"],
      */
 
     // var PolygonDragger = function(getP0, getP1, getP2, getP3, drawStyle) {
-    var PolygonDragger = function(getP0, getP1, getP2, getP3) {
+    // var PolygonDragger = function(getP0, getP1, getP2, getP3) {
+    var PolygonDragger = function(getP) {
 
         // remember the callbacks
-        this.getP0 = getP0;
-        this.getP1 = getP1;
-        this.getP2 = getP2;
-        this.getP3 = getP3;
+        this.getP = getP;
+
+        // this.getP0 = getP0;
+        // this.getP1 = getP1;
+        // this.getP2 = getP2;
+        // this.getP3 = getP3;
         
         // default draw style for the dragger
         this.drawStyle = {};
@@ -63,32 +66,18 @@ define(["util", "scene"],
     };
 
     /*
-     * draw the dragger as a small circle
+     * draw the dragger, i.e. the control polygon
      */
     PolygonDragger.prototype.draw = function (context) {
-
-        var p0 = this.getP0();
-        var p1 = this.getP1();
-        var p2 = this.getP2();
-        var p3 = this.getP3();
-
+        
         context.beginPath();
-        context.moveTo(p0[0], p0[1]);
-        context.lineTo(p1[0], p1[1]);
-        context.lineTo(p2[0], p2[1]);
-        context.lineTo(p3[0], p3[1]);
+        var p = this.getP[0]();
+        context.moveTo(p[0], p[1]);
 
-        // var p = []
-        // p.push(this.getP0());
-        // p.push(this.getP1());
-        // p.push(this.getP2());
-        // p.push(this.getP3());
-
-        // context.beginPath();
-        // context.moveTo(p[0][0], p[0][1]);
-        // for (var i = 1; i < p.length; i++) {
-        //     context.lineTo(p[i][0], p[i][1]);
-        // }
+        for (var i = 1; i < this.getP.length; i++) {
+            p = this.getP[i]();
+            context.lineTo(p[0], p[1]);
+        }
         
         // draw style
         context.lineWidth   = this.drawStyle.width;

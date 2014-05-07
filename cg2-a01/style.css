@@ -52,3 +52,8 @@ label {
     display: inline-block;
     width: 5em;
 }
+
+/* radius input area is hidden by default */
+#inputAreaRadius {
+    display:none;
+}

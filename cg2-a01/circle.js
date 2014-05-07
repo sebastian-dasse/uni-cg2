@@ -30,10 +30,6 @@ define(["util", "vec2", "scene", "point_dragger"],
      */ 
 
     var Circle = function(center, radius, lineStyle) {
-
-        console.log("creating circle at [" + 
-                    center[0] + "," + center[1] + "] with radius " +
-                    radius + ".");
         
         // draw style for drawing the circle
         this.lineStyle = lineStyle || { width: "2", color: "#0000AA" };
@@ -44,6 +40,9 @@ define(["util", "vec2", "scene", "point_dragger"],
         var orbitPoint = [center[0] + radius , center[1]];
         this.radiusVec = vec2.sub(orbitPoint, center);
         
+        // console.log("creating circle at [" + 
+        //             center[0] + "," + center[1] + "] with radius " +
+        //             radius + ".");
     };
 
     // returns the radius of this circle

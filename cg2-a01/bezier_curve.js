@@ -41,6 +41,7 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         // draw style for drawing the circle
         this.lineStyle = lineStyle || { width: "2", color: "#0000AA" };
         
+        this.scene = scene;
         this.segments = segments || 20;
 
         // the control points
@@ -49,7 +50,6 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         this.p2 = [ 0 *200 + 250, -1 *100 + 200];
         this.p3 = [ 1 *200 + 250,  0 *100 + 200];
 
-        this.scene = scene;
         this.x_formula;
         this.y_formula;
 
@@ -57,13 +57,15 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         this.t_min = 0;
         this.t_max = 1;
 
-        this.update();
+        this.calculate();
         
-        console.log("creating bezier curve [segments: " + this.segments + "].");
+        // console.log("creating bezier curve from [" + 
+        //             this.p0[0] + "," + this.p0[1] + "] to [" +
+        //             this.p3[0] + "," + this.p3[1] + "].");
     };
 
     // calculate the formula and all points for this curve
-    BezierCurve.prototype.update = function() {
+    BezierCurve.prototype.calculate = function() {
         this.x_formula = b0 + "*" + this.p0[0] + " + " + 
                          b1 + "*" + this.p1[0] + " + " + 
                          b2 + "*" + this.p2[0] + " + " + 
@@ -80,51 +82,45 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
     // set the control point p0
     BezierCurve.prototype.setP0 = function(p0) {
         this.p0 = p0;
-        this.update();
+        this.calculate();
     }
 
     // set the control point p2
     BezierCurve.prototype.setP1 = function(p1) {
         this.p1 = p1;
-        this.update();
+        this.calculate();
     }
 
     // set the control point p2
     BezierCurve.prototype.setP2 = function(p2) {
         this.p2 = p2;
-        this.update();
+        this.calculate();
     }
 
     // set the control point p3
     BezierCurve.prototype.setP3 = function(p3) {
         this.p3 = p3;
-        this.update();
+        this.calculate();
     }
 
     // set the minimum for t
     BezierCurve.prototype.setTMin = function(t_min) {
         this.t_min = t_min;
-        this.update();
+        this.calculate();
     };
 
     // set the maximum for t
     BezierCurve.prototype.setTMax = function(t_max) {
         this.t_max = t_max;
-        this.update();
+        this.calculate();
     };
 
     // 
     BezierCurve.prototype.setSegments = function(segments) {
         this.segments = segments;
-        // this.calculatePoints();
         this.curve.setSegments(segments);
-        this.update();
+        this.calculate();
     };
-
-    // turn the tick marks on or off
-    // BezierCurve.prototype.toggleTicks = function() {
-    //     this.curve.toggleTicks();
-    // };
 
     // draw this circle into the provided 2D rendering context
     BezierCurve.prototype.draw = function(context) {
@@ -154,7 +150,7 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         var setP2 = function(dragEvent) { _curve.setP2(dragEvent.position); };
         var setP3 = function(dragEvent) { _curve.setP3(dragEvent.position); };
         
-        draggers.push( new PolygonDragger(getP0, getP1, getP2, getP3) );
+        draggers.push( new PolygonDragger([getP0, getP1, getP2, getP3]) );
 
         draggers.push( new PointDragger(getP0, setP0, draggerStyle) );
         draggers.push( new PointDragger(getP1, setP1, draggerStyle2) );

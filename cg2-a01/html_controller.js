@@ -11,8 +11,8 @@
 
  
 /* requireJS module definition */
-define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"], 
-       (function($, StraightLine, Circle, ParametricCurve, BezierCurve) {
+define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve", "bezier_curve2"], 
+       (function($, StraightLine, Circle, ParametricCurve, BezierCurve, BezierCurve2) {
 
     "use strict"; 
                 
@@ -149,6 +149,25 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"]
         /*
          * TODO: Dok it!
          */
+        $("#btnNewBezierCurve2").click( (function() {
+
+            // var style = {
+            //     width: Math.floor(Math.random()*3)+1, 
+            //     color: randomColor()
+            // };
+
+            // var bezierCurve = new BezierCurve2(scene, points, depth, delta, style);
+            // var bezierCurve2 = new BezierCurve2(scene, [], 0, 1, {});
+            var bezierCurve2 = new BezierCurve2(scene, [], 4);
+            scene.addObjects([bezierCurve2]);
+
+            sceneController.deselect();
+            sceneController.select(bezierCurve2);
+        }));
+
+        /*
+         * TODO: Dok it!
+         */
         $("#inputLineColor").change(function(evt) {
             var obj = sceneController.getSelectedObject();
             if (!obj) { return; }
@@ -259,6 +278,35 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"]
         /*
          * TODO: Dok it!
          */
+        $("#inputDepth").change(function(evt) {
+            var obj = sceneController.getSelectedObject();
+            if (!obj) { return; };
+
+            var newVal = parseInt($("#inputDepth").val());
+            if (obj.setDepth && (0 <= newVal) && newVal <= 20) { // TODO: "Konstante" einführen
+                obj.setDepth(newVal);
+            }
+            console.log("dp " + obj.depth);
+            sceneController.select(obj);
+        });
+
+        /*
+         * TODO: Dok it!
+         */
+        // $("#inputDelta").change(function(evt) {
+        //     var obj = sceneController.getSelectedObject();
+        //     if (!obj) { return; };
+
+        //     var newVal = parseInt($("#inputSegments").val());
+        //     if (obj.setSegments && 1 <= newVal && newVal <= ParametricCurve.MAX_SEGMENTS) {
+        //         obj.setSegments(newVal);
+        //     }
+        //     sceneController.select(obj);
+        // });
+
+        /*
+         * TODO: Dok it!
+         */
         $("#inputTickMarks").change(function(evt) {
             scene.ticksOn = !scene.ticksOn;
             
@@ -275,28 +323,31 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"]
                 $("#inputLineColor").val(style.color);
                 $("#inputLineWidth").val(style.width);
 
-                if (obj.getRadius) {
+                if (obj instanceof Circle) {
                     $("#inputAreaRadius").show();
                     $("#inputRadius").val(obj.getRadius());
-                    sceneController.scene.draw(context);
+                    // sceneController.scene.draw(context);
                 } else {
                     $("#inputAreaRadius").hide();
                 }
 
-                if (obj.x_formula) {
+                if (obj instanceof ParametricCurve || obj instanceof BezierCurve) {
+                    $("#inputAreaParametricCurve").show();
                     $("#inputX").val(obj.x_formula);
-                }
-                if (obj.y_formula) {
                     $("#inputY").val(obj.y_formula);
-                }
-                if (obj.t_min !== undefined) {
                     $("#inputTMin").val(obj.t_min);
-                }
-                if (obj.t_max !== undefined) {
                     $("#inputTMax").val(obj.t_max);
-                }
-                if (obj.segments) {
                     $("#inputSegments").val(obj.segments);
+                } else {
+                    $("#inputAreaParametricCurve").hide();
+                }
+
+                if (obj instanceof BezierCurve2) {
+                    $("#inputAreaBezierCurve2").show();
+                    $("#inputDepth").val(obj.depth);
+                    $("#inputDelta").val(obj.delta);
+                } else {
+                    $("#inputAreaBezierCurve2").hide();
                 }
             };
         };
@@ -304,11 +355,6 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve"]
         // TODO: Dok it!
         sceneController.onSelection(showParams());
         sceneController.onObjChange(showParams());
-
-        /*
-         * TODO: Dok it!
-         */
-        $("#inputAreaRadius").hide();
         
 
     };
