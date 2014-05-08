@@ -57,3 +57,13 @@ label {
 #inputAreaRadius {
     display:none;
 }
+
+/* input area for parametric curve is hidden by default */
+#inputAreaParametricCurve {
+    display:none;
+}
+
+/* input area for bezier curve 2 is hidden by default */
+#inputAreaBezierCurve2 {
+    display:none;
+}

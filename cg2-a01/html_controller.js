@@ -158,7 +158,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
 
             // var bezierCurve = new BezierCurve2(scene, points, depth, delta, style);
             // var bezierCurve2 = new BezierCurve2(scene, [], 0, 1, {});
-            var bezierCurve2 = new BezierCurve2(scene, [], 4);
+            var bezierCurve2 = new BezierCurve2(scene, [], 4, 2);
             scene.addObjects([bezierCurve2]);
 
             sceneController.deselect();
@@ -283,26 +283,25 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
             if (!obj) { return; };
 
             var newVal = parseInt($("#inputDepth").val());
-            if (obj.setDepth && (0 <= newVal) && newVal <= 20) { // TODO: "Konstante" einführen
+            if (obj.setDepth && (0 <= newVal) && newVal <= 10) { // TODO: "Konstante" einführen
                 obj.setDepth(newVal);
             }
-            console.log("dp " + obj.depth);
             sceneController.select(obj);
         });
 
         /*
          * TODO: Dok it!
          */
-        // $("#inputDelta").change(function(evt) {
-        //     var obj = sceneController.getSelectedObject();
-        //     if (!obj) { return; };
+        $("#inputDelta").change(function(evt) {
+            var obj = sceneController.getSelectedObject();
+            if (!obj) { return; };
 
-        //     var newVal = parseInt($("#inputSegments").val());
-        //     if (obj.setSegments && 1 <= newVal && newVal <= ParametricCurve.MAX_SEGMENTS) {
-        //         obj.setSegments(newVal);
-        //     }
-        //     sceneController.select(obj);
-        // });
+            var newVal = parseFloat($("#inputDelta").val());
+            if (obj.setDelta && 1 <= newVal && newVal <= 180) { // TODO: "Konstante" einführen
+                obj.setDelta(newVal);
+            }
+            sceneController.select(obj);
+        });
 
         /*
          * TODO: Dok it!

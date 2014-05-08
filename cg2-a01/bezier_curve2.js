@@ -48,10 +48,6 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         this.p1 = points[1] || [ 0 *200 + 250,  1 *100 + 200];
         this.p2 = points[2] || [ 0 *200 + 250, -1 *100 + 200];
         this.p3 = points[3] || [ 1 *200 + 250,  0 *100 + 200];
-        // this.p0 = points[0];
-        // this.p1 = points[1];
-        // this.p2 = points[2];
-        // this.p3 = points[3];
 
         this.curves = [];   // 
 
@@ -60,7 +56,7 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         
         this.depth = depth; //
         // this.delta = delta || 20; //
-        this.delta = 20; //
+        this.delta = delta; //
 
         this.calculate();
         
@@ -74,28 +70,8 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         this.curves = [];
         this.lines = [];
 
-        console.log( angleBetween(this.p0, this.p1, this.p2) );
-        console.log( angleBetween(this.p1, this.p2, this.p3) );
-
-        if (this.depth > 0 
-            // || 
-            // angleBetween(this.p0, this.p1, this.p2) > this.delta ||
-            // angleBetween(this.p1, this.p2, this.p3) > this.delta 
-            ) {
-            
-            var t = 0.5;
-
-            var a0 = interpolate(this.p0, this.p1, t);
-            var a1 = interpolate(this.p1, this.p2, t);
-            var a2 = interpolate(this.p2, this.p3, t);
-
-            var b0 = interpolate(a0, a1, t);
-            var b1 = interpolate(a1, a2, t);
-            
-            var c0 = interpolate(b0, b1, t);
-            
-            this.curves.push( new BezierCurve2(this.scene, [this.p0, a0, b0, c0], this.depth - 1, this.delta, this.lineStyle) );
-            this.curves.push( new BezierCurve2(this.scene, [c0, b1, a2, this.p3], this.depth - 1, this.delta, this.lineStyle) );
+        if (this.depth > 0 || deviationTooBig(this)) {    
+            this.curves = subdivide(this);
         } else {
             this.lines.push( new StraightLine(this.p0, this.p1, this.lineStyle) );
             this.lines.push( new StraightLine(this.p1, this.p2, this.lineStyle) );
@@ -238,12 +214,36 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         context.stroke();
     };
 
+    // return true, if one of the two inner angles is bigger than the allowed maximum delta
+    var deviationTooBig = function(curve) {
+        return Math.abs( angleBetween(curve.p0, curve.p1, curve.p2) - 180) > curve.delta ||
+               Math.abs( angleBetween(curve.p1, curve.p2, curve.p3) - 180) > curve.delta;
+    };
+
     // return the angle in degrees between the given points; if two points are equal, 0 is returned
     var angleBetween = function(p0, p1, p2) {
         var v0 = vec2.sub(p0, p1);
         var v1 = vec2.sub(p2, p1);
         var len = vec2.length(v0) * vec2.length(v1);
         return (len === 0) ? 0 : Math.acos( vec2.dot(v0, v1) / len ) * 180 / Math.PI;
+    };
+
+    // subdivide the given bezier curve through de Casteljau's algorrithm and return the two resulting bezier curves as an array
+    var subdivide = function(curve) {
+        
+        var t = 0.5;
+
+        var a0 = interpolate(curve.p0, curve.p1, t);
+        var a1 = interpolate(curve.p1, curve.p2, t);
+        var a2 = interpolate(curve.p2, curve.p3, t);
+
+        var b0 = interpolate(a0, a1, t);
+        var b1 = interpolate(a1, a2, t);
+        
+        var c0 = interpolate(b0, b1, t);
+
+        return [ new BezierCurve2(curve.scene, [curve.p0, a0, b0, c0], curve.depth - 1, curve.delta, curve.lineStyle), 
+                 new BezierCurve2(curve.scene, [c0, b1, a2, curve.p3], curve.depth - 1, curve.delta, curve.lineStyle) ];
     };
 
     return BezierCurve2;
