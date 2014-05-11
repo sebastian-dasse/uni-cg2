@@ -1,13 +1,11 @@
 /*
- * JavaScript / Canvas teaching framwork 
- * (C)opyright Hartmut Schirmacher, hschirmacher.beuth-hochschule.de 
- *
  * Module: bezier_curve
  *
  * A Bezier curve knows how to draw itself into a specified 2D context
  * and can tell whether a certain mouse position "hits" the object,
  * and implements the function createDraggers() to create a set of
- * draggers to manipulate itself.
+ * draggers to manipulate itself. It is calculated by parametrizing the 
+ * cubic Bernstein polynomials through four control points.
  *
  */
 
@@ -21,10 +19,9 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
     /**
      *  A Bezier curve can be dragged around by its four control points.
      *  Parameters:
-     *  - p0, p1, p2 and p3: array objects representing [x,y] coordinates of the four control points
-     *  - x_formula and y_formula: strings representing the formulas for the x and the y component
-     *  - t_min and t_max: the minimum value and the maximum value for the parameter t
-     *  - segments: the number of segments
+     *  - points: array object containing the four control points, which themselves are array objects representing [x,y] coordinates
+     *  - segments: the number of segments used for the approximated curve
+     *  - scene: the scene, which knows whether or not tick marks should be drawn
      *  - lineStyle: object defining width and color attributes for line drawing, 
      *       begin of the form { width: 2, color: "#00FF00" }
      */ 
@@ -35,20 +32,19 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
     var b2 = "3*(1-t)*t*t";
     var b3 = "t*t*t";
 
-    // var BezierCurve = function(p0, p1, p2, p3, segments, lineStyle) {
-    var BezierCurve = function(scene, segments, lineStyle) {
-        
+    var BezierCurve = function(points, segments, scene, lineStyle) {
+
         // draw style for drawing the circle
         this.lineStyle = lineStyle || { width: "2", color: "#0000AA" };
         
-        this.scene = scene;
-        this.segments = segments || 20;
-
         // the control points
-        this.p0 = [-1 *200 + 250,  0 *100 + 200];
-        this.p1 = [ 0 *200 + 250,  1 *100 + 200];
-        this.p2 = [ 0 *200 + 250, -1 *100 + 200];
-        this.p3 = [ 1 *200 + 250,  0 *100 + 200];
+        this.p0 = points[0] || [-1 *200 + 250,  0 *100 + 200];
+        this.p1 = points[1] || [ 0 *200 + 250,  1 *100 + 200];
+        this.p2 = points[2] || [ 0 *200 + 250, -1 *100 + 200];
+        this.p3 = points[3] || [ 1 *200 + 250,  0 *100 + 200];
+
+        this.segments = segments || 20;
+        this.scene = scene;
 
         this.x_formula;
         this.y_formula;
@@ -75,8 +71,7 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
                          b2 + "*" + this.p2[1] + " + " + 
                          b3 + "*" + this.p3[1];
         
-        // this.curve = new ParametricCurve(this.scene, this.x_formula, this.y_formula, 0, 1, this.segments, this.lineStyle);
-        this.curve = new ParametricCurve(this.scene, this.x_formula, this.y_formula, this.t_min, this.t_max, this.segments, this.lineStyle);
+        this.curve = new ParametricCurve(this.x_formula, this.y_formula, this.t_min, this.t_max, this.segments, this.scene, this.lineStyle);
     }
 
     // set the control point p0
@@ -115,7 +110,7 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         this.calculate();
     };
 
-    // 
+    // set the number of segments
     BezierCurve.prototype.setSegments = function(segments) {
         this.segments = segments;
         this.curve.setSegments(segments);

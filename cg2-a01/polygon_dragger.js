@@ -1,14 +1,7 @@
 /*
- * JavaScript / Canvas teaching framwork 
- * (C)opyright Hartmut Schirmacher, hschirmacher.beuth-hochschule.de 
- *
  * Module: polygon_dragger
  *
- * TODO: Dok it all !!!
- *
- * A PolygonDragger is a drawable object than can react to 
- * events from a SceneController. It will typically control
- * the position of one vertex/point of a scene obejct.
+ * A PolygonDragger draws the control polygon of a cubic bezier curve.
  *
  */
 
@@ -20,14 +13,13 @@ define(["util", "scene"],
     "use strict";
 
     /*
-     * A dragger is a visible handle to move a 2D point around
-     * using the 2D rendering features of the HTML5 canvas element. 
+     * A polygon dragger draws the control polygon of a cubic bezier curve. 
      * Parameters:
      *
-     * - getPos [ function() --> [x,y] ]
+     * - getP [ function() --> [x,y] ]
      *
-     *   callback function that will return the position of the dragger 
-     *   as an array [x,y]
+     *   an array of callback functions, one for each control point; the callbacks 
+     *   will return the coordinates of each point as an array [x,y]
      *
      * - setPos [ function(dragEvent) ]
      *
@@ -37,28 +29,21 @@ define(["util", "scene"],
      *        of the mouse, and delta is the difference vector pointing from 
      *        the last known dragging position to the current mouse position.
      *
-     * - drawStyle [ {radius: 5, width: 2, color: "#FF00FF", fill: false} ] 
+     * - drawStyle [ {radius: 5, width: 2, color: "#FF00FF"} ] 
      *
      *        specification object for the drawing style, example see above 
      * 
      */
 
-    // var PolygonDragger = function(getP0, getP1, getP2, getP3, drawStyle) {
-    // var PolygonDragger = function(getP0, getP1, getP2, getP3) {
-    var PolygonDragger = function(getP) {
+    var PolygonDragger = function(getP, drawStyle) {
 
         // remember the callbacks
         this.getP = getP;
-
-        // this.getP0 = getP0;
-        // this.getP1 = getP1;
-        // this.getP2 = getP2;
-        // this.getP3 = getP3;
         
         // default draw style for the dragger
-        this.drawStyle = {};
-        this.drawStyle.width = 1;
-        this.drawStyle.color = "#999999";
+        this.drawStyle = drawStyle || {};
+        this.drawStyle.width = drawStyle.width || 1;
+        this.drawStyle.color = drawStyle.color || "#999999";
         
         // attribute queried by SceneController to recognize draggers
         this.isDragger = true; 
@@ -87,14 +72,6 @@ define(["util", "scene"],
         // trigger the actual drawing
         context.stroke();
     };
-
-    // PolygonDragger.prototype.isHit = function (context,mousePos) {
-    //     return false;
-    // };
-
-    // PolygonDragger.prototype.mouseDrag = function (dragEvent) {
-
-    // };
 
     // this module exposes only the constructor for Dragger objects
     return PolygonDragger;

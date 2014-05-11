@@ -34,10 +34,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
         };
 
         // generate random radius for a given point coordinate within the canvas
-        var randomRadius = function(x, y) { 
-            
-            // TODO: sinnvolle Berechnung überlegen!
-
+        var randomRadius = function(x, y) {
             return Math.floor(Math.random()*(context.canvas.height-10) / 2);
         };
             
@@ -60,7 +57,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
         };
         
         /*
-         * event handler for "new line button".
+         * event handler for "new line" button
          */
         $("#btnNewLine").click( (function() {
         
@@ -82,7 +79,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
         }));
 
         /*
-         * event handler for "new circle button".
+         * event handler for "new circle" button
          */
         $("#btnNewCircle").click( (function() {
         
@@ -104,7 +101,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
         }));
 
         /*
-         * TODO: Dok it!
+         * event handler for "new parametric curve" button
          */
         $("#btnNewParametricCurve").click( (function() {
 
@@ -119,7 +116,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
             var t_max = $("#inputTMax").val();
             var segments = $("#inputSegments").val();
 
-            var parametricCurve = new ParametricCurve(scene, x, y, t_min, t_max, segments, style);
+            var parametricCurve = new ParametricCurve(x, y, t_min, t_max, segments, scene, style);
             scene.addObjects([parametricCurve]);
 
             sceneController.deselect();
@@ -127,19 +124,16 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
         }));
 
         /*
-         * TODO: Dok it!
+         * event handler for "new bezier curve" button
          */
         $("#btnNewBezierCurve").click( (function() {
 
-            // var style = {
-            //     width: Math.floor(Math.random()*3)+1, 
-            //     color: randomColor()
-            // };
+            var style = {
+                width: Math.floor(Math.random()*3)+1, 
+                color: randomColor()
+            };
 
-            // var segments = $("#inputSegments").val();
-
-            // var bezierCurve = new BezierCurve(scene, segments, style);
-            var bezierCurve = new BezierCurve(scene);
+            var bezierCurve = new BezierCurve({}, 20, scene, style);
             scene.addObjects([bezierCurve]);
 
             sceneController.deselect();
@@ -147,18 +141,16 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
         }));
 
         /*
-         * TODO: Dok it!
+         * event handler for "new bezier curve (de casteljau)" button
          */
         $("#btnNewBezierCurve2").click( (function() {
 
-            // var style = {
-            //     width: Math.floor(Math.random()*3)+1, 
-            //     color: randomColor()
-            // };
+            var style = {
+                width: Math.floor(Math.random()*3)+1, 
+                color: randomColor()
+            };
 
-            // var bezierCurve = new BezierCurve2(scene, points, depth, delta, style);
-            // var bezierCurve2 = new BezierCurve2(scene, [], 0, 1, {});
-            var bezierCurve2 = new BezierCurve2(scene, [], 4, 2);
+            var bezierCurve2 = new BezierCurve2([], 4, 2, scene, style);
             scene.addObjects([bezierCurve2]);
 
             sceneController.deselect();
@@ -166,7 +158,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
         }));
 
         /*
-         * TODO: Dok it!
+         * event handler for "line color" input field
          */
         $("#inputLineColor").change(function(evt) {
             var obj = sceneController.getSelectedObject();
@@ -180,14 +172,14 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
         });
 
         /*
-         * TODO: Dok it!
+         * event handler for "line width" input field
          */
         $("#inputLineWidth").change(function(evt) {
             var obj = sceneController.getSelectedObject();
             if (!obj) { return; }
 
             var MIN_WIDTH = 1;
-            var MAX_WIDTH = 5;
+            var MAX_WIDTH = 100;
 
             var newWidth = parseInt(evt.currentTarget.value);
             if (newWidth && MIN_WIDTH <= newWidth && newWidth <= MAX_WIDTH) {
@@ -197,22 +189,23 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
         });
 
         /*
-         * TODO: Dok it!
+         * event handler for "radius" input field
          */
         $("#inputRadius").change(function(evt) {
             var obj = sceneController.getSelectedObject();
 
-            var MAX_RADIUS = 250;
+            var MIN_RADIUS = 1;
+            var MAX_RADIUS = context.canvas.width / 2;
 
             var newRadius = parseInt(evt.currentTarget.value);
-            if (newRadius && 1 <= newRadius && newRadius <= MAX_RADIUS) { // context.canvas.width / 2 == 250
+            if (newRadius && MIN_RADIUS <= newRadius && newRadius <= MAX_RADIUS) {
                 obj.setRadius(newRadius);
             }
             sceneController.select(obj);
         });
 
         /*
-         * TODO: Dok it!
+         * event handler for "x(t)" input field
          */
         $("#inputX").change(function(evt) {
             var obj = sceneController.getSelectedObject();
@@ -223,7 +216,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
         });
         
         /*
-         * TODO: Dok it!
+         * event handler for "y(t)" input field
          */
         $("#inputY").change(function(evt) {
             var obj = sceneController.getSelectedObject();
@@ -234,7 +227,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
         });
 
         /*
-         * TODO: Dok it!
+         * event handler for "min t" input field
          */
         $("#inputTMin").change(function(evt) {
             var obj = sceneController.getSelectedObject();
@@ -248,7 +241,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
         });
 
         /*
-         * TODO: Dok it!
+         * event handler for "max t" input field
          */
         $("#inputTMax").change(function(evt) {
             var obj = sceneController.getSelectedObject();
@@ -262,49 +255,58 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
         });
 
         /*
-         * TODO: Dok it!
+         * event handler for "segments" input field
          */
         $("#inputSegments").change(function(evt) {
             var obj = sceneController.getSelectedObject();
             if (!obj) { return; };
 
+            var MIN_SEGMENTS = 1;
+            var MAX_SEGMENTS = 5000;
+
             var newVal = parseInt($("#inputSegments").val());
-            if (obj.setSegments && 1 <= newVal && newVal <= ParametricCurve.MAX_SEGMENTS) {
+            if (obj.setSegments && MIN_SEGMENTS <= newVal && newVal <= MAX_SEGMENTS) {
                 obj.setSegments(newVal);
             }
             sceneController.select(obj);
         });
 
         /*
-         * TODO: Dok it!
+         * event handler for "max depth" input field
          */
         $("#inputDepth").change(function(evt) {
             var obj = sceneController.getSelectedObject();
             if (!obj) { return; };
 
+            var MIN_DEPTH = 0;
+            var MAX_DEPTH = 10;
+
             var newVal = parseInt($("#inputDepth").val());
-            if (obj.setDepth && (0 <= newVal) && newVal <= 10) { // TODO: "Konstante" einführen
+            if (obj.setDepth && MIN_DEPTH <= newVal && newVal <= MAX_DEPTH) {
                 obj.setDepth(newVal);
             }
             sceneController.select(obj);
         });
 
         /*
-         * TODO: Dok it!
+         * event handler for "max delta" input field
          */
         $("#inputDelta").change(function(evt) {
             var obj = sceneController.getSelectedObject();
             if (!obj) { return; };
 
+            var MIN_DELTA = 1;
+            var MAX_DELTA = 180;
+
             var newVal = parseFloat($("#inputDelta").val());
-            if (obj.setDelta && 1 <= newVal && newVal <= 180) { // TODO: "Konstante" einführen
+            if (obj.setDelta && MIN_DELTA <= newVal && newVal <= MAX_DELTA) {
                 obj.setDelta(newVal);
             }
             sceneController.select(obj);
         });
 
         /*
-         * TODO: Dok it!
+         * event handler for "tick marks" checkbox
          */
         $("#inputTickMarks").change(function(evt) {
             scene.ticksOn = !scene.ticksOn;
@@ -313,7 +315,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
             obj && sceneController.select(obj);
         });
 
-        // TODO: Dok it! >>>>>>>>>
+        // event handler that shows the input fields for the parameters of the selected or changed object
         var showParams = function() {
             return function() {
                 var obj = sceneController.getSelectedObject();
@@ -325,7 +327,6 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
                 if (obj instanceof Circle) {
                     $("#inputAreaRadius").show();
                     $("#inputRadius").val(obj.getRadius());
-                    // sceneController.scene.draw(context);
                 } else {
                     $("#inputAreaRadius").hide();
                 }
@@ -351,7 +352,7 @@ define(["jquery", "straight_line", "circle", "parametric_curve", "bezier_curve",
             };
         };
 
-        // TODO: Dok it!
+        // add event handlers
         sceneController.onSelection(showParams());
         sceneController.onObjChange(showParams());
         

@@ -1,7 +1,4 @@
 /*
- * JavaScript / Canvas teaching framwork 
- * (C)opyright Hartmut Schirmacher, hschirmacher.beuth-hochschule.de 
- *
  * Module: circle
  *
  * A Circle knows how to draw itself into a specified 2D context,
@@ -86,6 +83,7 @@ define(["util", "vec2", "scene", "point_dragger"],
     Circle.prototype.createDraggers = function() {
 
         var draggerStyle = { radius:4, color: this.lineStyle.color, width:0, fill:true };
+        var draggerStyle2 = (this.lineStyle.width <=5) ? draggerStyle : { radius:4, color: "#dadada", width:0, fill:true };
         var draggers = [];
 
         // create closure and callbacks for dragger
@@ -95,7 +93,7 @@ define(["util", "vec2", "scene", "point_dragger"],
         var setCenter = function(dragEvent) { _circle.center = dragEvent.position; };
         var setOrbitPt = function(dragEvent) { _circle.radiusVec = vec2.sub(dragEvent.position, _circle.center); };
         draggers.push( new PointDragger(getCenter, setCenter, draggerStyle) );
-        draggers.push( new PointDragger(getOrbitPt, setOrbitPt, draggerStyle) );
+        draggers.push( new PointDragger(getOrbitPt, setOrbitPt, draggerStyle2) );
         
         return draggers;
         

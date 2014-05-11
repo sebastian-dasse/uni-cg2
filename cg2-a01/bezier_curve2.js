@@ -1,13 +1,11 @@
 /*
- * JavaScript / Canvas teaching framwork 
- * (C)opyright Hartmut Schirmacher, hschirmacher.beuth-hochschule.de 
- *
  * Module: bezier_curve2
  *
  * A Bezier curve knows how to draw itself into a specified 2D context
  * and can tell whether a certain mouse position "hits" the object,
  * and implements the function createDraggers() to create a set of
- * draggers to manipulate itself.
+ * draggers to manipulate itself. It is calculated through continued 
+ * adaptive subdivision using de Casteljau's algorithm.
  *
  */
 
@@ -21,10 +19,10 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
     /**
      *  A Bezier curve can be dragged around by its four control points.
      *  Parameters:
-     *  - p0, p1, p2 and p3: array objects representing [x,y] coordinates of the four control points
-     *  - x_formula and y_formula: strings representing the formulas for the x and the y component
-     *  - t_min and t_max: the minimum value and the maximum value for the parameter t
-     *  - segments: the number of segments
+     *  - points: array object containing the four control points, which themselves are array objects representing [x,y] coordinates
+     *  - depth: the maximum depth for the recursive subdivision
+     *  - delta: the maximum deviation of the interior angles of the control polygon
+     *  - segments: the number of segments used for the approximated curve
      *  - lineStyle: object defining width and color attributes for line drawing, 
      *       begin of the form { width: 2, color: "#00FF00" }
      */ 
@@ -35,13 +33,10 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
     var b2 = "3*(1-t)*t*t";
     var b3 = "t*t*t";
 
-    // var BezierCurve2 = function(p0, p1, p2, p3, segments, lineStyle) {
-    var BezierCurve2 = function(scene, points, depth, delta, lineStyle) {
+    var BezierCurve2 = function(points, depth, delta, scene, lineStyle) {
         
         // draw style for drawing the circle
         this.lineStyle = lineStyle || { width: "2", color: "#0000AA" };
-
-        this.scene = scene;
 
         // the control points
         this.p0 = points[0] || [-1 *200 + 250,  0 *100 + 200];
@@ -49,15 +44,15 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         this.p2 = points[2] || [ 0 *200 + 250, -1 *100 + 200];
         this.p3 = points[3] || [ 1 *200 + 250,  0 *100 + 200];
 
-        this.curves = [];   // 
+        this.depth = depth;
+        this.delta = delta;
+        this.scene = scene;
+        
+        this.curves = [];   // if this curve is subdivided, the resulting partial curves are stored here
 
         // the lines for the approximated parametric curve - only used for isHit(), because drawing individual lines does not look so good
         this.lines = [];
         
-        this.depth = depth; //
-        // this.delta = delta || 20; //
-        this.delta = delta; //
-
         this.calculate();
         
         // console.log("creating bezier curve 2 from [" + 
@@ -170,7 +165,7 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         var draggerStyle = { radius:4, color: this.lineStyle.color, width:0, fill:true }
         var draggerStyle2 = { radius:4, color: this.lineStyle.color, width:0, fill:false }
         var draggers = [];
-        
+
         // create closure and callbacks for dragger
         var _curve = this;
         var getP0 = function() { return _curve.p0; };
@@ -183,12 +178,11 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         var setP3 = function(dragEvent) { _curve.setP3(dragEvent.position); };
         
         draggers.push( new PolygonDragger([getP0, getP1, getP2, getP3]) );
-
+    
         draggers.push( new PointDragger(getP0, setP0, draggerStyle) );
         draggers.push( new PointDragger(getP1, setP1, draggerStyle2) );
         draggers.push( new PointDragger(getP2, setP2, draggerStyle2) );
         draggers.push( new PointDragger(getP3, setP3, draggerStyle) );
-
         
         return draggers;
     };
@@ -228,7 +222,7 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         return (len === 0) ? 0 : Math.acos( vec2.dot(v0, v1) / len ) * 180 / Math.PI;
     };
 
-    // subdivide the given bezier curve through de Casteljau's algorrithm and return the two resulting bezier curves as an array
+    // subdivide the given bezier curve through de Casteljau's algorithm and return the two resulting bezier curves as an array
     var subdivide = function(curve) {
         
         var t = 0.5;
@@ -242,8 +236,8 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         
         var c0 = interpolate(b0, b1, t);
 
-        return [ new BezierCurve2(curve.scene, [curve.p0, a0, b0, c0], curve.depth - 1, curve.delta, curve.lineStyle), 
-                 new BezierCurve2(curve.scene, [c0, b1, a2, curve.p3], curve.depth - 1, curve.delta, curve.lineStyle) ];
+        return [ new BezierCurve2([curve.p0, a0, b0, c0], curve.depth - 1, curve.delta, curve.scene, curve.lineStyle), 
+                 new BezierCurve2([c0, b1, a2, curve.p3], curve.depth - 1, curve.delta, curve.scene, curve.lineStyle) ];
     };
 
     return BezierCurve2;

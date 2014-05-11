@@ -1,7 +1,4 @@
 /*
- * JavaScript / Canvas teaching framwork 
- * (C)opyright Hartmut Schirmacher, hschirmacher.beuth-hochschule.de 
- *
  * Module: parametric_curve
  *
  * A Parametric curve knows how to draw itself into a specified 2D context
@@ -23,23 +20,23 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
      *  Parameters:
      *  - x_formula and y_formula: strings representing the formulas for the x and the y component
      *  - t_min and t_max: the minimum value and the maximum value for the parameter t
-     *  - segments: the number of segments
-     *  - p: an array representing the list of all points on this curve that are used for the approximation
+     *  - segments: the number of segments used for the approximated curve
+     *  - scene: the scene, which knows whether or not tick marks should be drawn
      *  - lineStyle: object defining width and color attributes for line drawing, 
      *       begin of the form { width: 2, color: "#00FF00" }
      */ 
 
-    var ParametricCurve = function(scene, x_formula, y_formula, t_min, t_max, segments, lineStyle) {
+    var ParametricCurve = function(x_formula, y_formula, t_min, t_max, segments, scene, lineStyle) {
         
         // draw style for drawing the circle
         this.lineStyle = lineStyle || { width: "2", color: "#0000AA" };
         
-        this.scene = scene;
         this.x_formula = isValidFormula(x_formula) && x_formula || "100*t";
         this.y_formula = isValidFormula(y_formula) && y_formula || "200+100*Math.sin(t)";
         this.t_min = t_min || 0;
         this.t_max = t_max || 2 * Math.PI;
         this.segments = segments || 20;
+        this.scene = scene;
         this.p = [];    // the points for the approximated parametric curve
         
         // the lines for the approximated parametric curve - only used for isHit(), because drawing individual lines does not look so good
@@ -52,9 +49,6 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
         //             this.p[0][0] + "," + this.p[0][1] + "] to [" +
         //             this.p[this.p.length-1][0] + "," + this.p[this.p.length-1][1] + "].");
     };
-
-    /* the maximum number of segments */
-    ParametricCurve.MAX_SEGMENTS = 5000;
 
     // calculate the x value for the given t
     ParametricCurve.prototype.x = function(t) { return eval(this.x_formula); };
@@ -169,6 +163,7 @@ define(["util", "vec2", "scene", "point_dragger", "straight_line"],
 
     // checks formula given as a string for validity, i.e. that it can be evaluated to finite numbers
     var isValidFormula = function(formula) {
+        if (!formula) { return false; }
         try {
             var t = 1;
             if (!isFinite(eval(formula))) {
