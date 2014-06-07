@@ -145,7 +145,7 @@ define(["util", "vec2", "scene", "point_dragger", "parametric_curve", "polygon_d
         var setP2 = function(dragEvent) { _curve.setP2(dragEvent.position); };
         var setP3 = function(dragEvent) { _curve.setP3(dragEvent.position); };
         
-        draggers.push( new PolygonDragger([getP0, getP1, getP2, getP3]) );
+        draggers.push( new PolygonDragger([getP0, getP1, getP2, getP3], {}) );
 
         draggers.push( new PointDragger(getP0, setP0, draggerStyle) );
         draggers.push( new PointDragger(getP1, setP1, draggerStyle2) );

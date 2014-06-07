@@ -41,7 +41,8 @@ define(["util", "scene"],
         this.getP = getP;
         
         // default draw style for the dragger
-        this.drawStyle = drawStyle || {};
+        drawStyle = drawStyle || {};
+        this.drawStyle = drawStyle;
         this.drawStyle.width = drawStyle.width || 1;
         this.drawStyle.color = drawStyle.color || "#999999";
         
