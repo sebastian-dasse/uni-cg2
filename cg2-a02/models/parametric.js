@@ -23,8 +23,6 @@ define(["vbo"],
      */ 
     var ParametricSurface = function(gl, posFunc, config) {
 
-        // window.console.log("ParametricSurface() constructor not implemented yet.")
-
         // read the configuration parameters
         config = config || {};
         var uMin       = config.uMin   || -Math.PI;
@@ -55,7 +53,6 @@ define(["vbo"],
                 coords.push(pos[0], pos[1], pos[2]);
             }
         }
-        console.log("coords.length: " + coords.length);
         
         // create vertex buffer object (VBO) for the coordinates
         this.coordsBuffer = new vbo.Attribute(gl, { "numComponents": 3,
@@ -64,12 +61,11 @@ define(["vbo"],
                                                   } );
         
         var triangles = [];
-        // for (var i = 0; i < this.numVertices; i += 4) {
         for(var i = 0; i < uSegments; i++) {
             for(var j = 0; j < vSegments; j++) {
                 
                 var k = i * (vSegments + 1) + j;
-                triangles.push(k + 0, k +             1, k + vSegments + 1, 
+                triangles.push(k    , k + 1            , k + vSegments + 1, 
                                k + 1, k + vSegments + 2, k + vSegments + 1); 
             }
         }
@@ -77,58 +73,51 @@ define(["vbo"],
         // create vertex buffer object (VBO) for the indices for the triangles
         this.trianglesBuffer = new vbo.Indices(gl, { "indices": triangles } );
 
-        console.log(this.coordsBuffer.numVertices());
-        console.log(this.trianglesBuffer.numIndices());
-        console.log(triangles);
-        // console.log(this.trianglesBuffer[this.trianglesBuffer.numIndices()]);
+        var lines = [];
+        for(var i = 0; i < uSegments; i++) {
+            for(var j = 0; j < vSegments; j++) {
+                
+                var k = i * (vSegments + 1) + j;
+                lines.push(k, k + 1, 
+                           k, k + vSegments + 1); 
+            }
+            // line for last row
+            lines.push(k + 1, k + vSegments + 2);
+        }
+        // lines for last column
+        var k = uSegments * (vSegments + 1);
+        for(var j = 0; j <= vSegments; j++) {
+            lines.push(k, k + j);
+        }
 
-        // var lines = [];
-        // for(var i = 0; i <= 3*uSegments; i += 3) {
-        //     for(var j = 0; j <= 3*vSegments; j += 3) {
+        // create vertex buffer object (VBO) for the indices for the lines
+        this.linesBuffer = new vbo.Indices(gl, { "indices": lines } );
 
-        //         var p0 = this.coordsBuffer()
-
-        //         // add a point for each position on the surface
-        //         // IMPORTANT: push each float value separately!
-        //         lines.push(pos[0], pos[1], pos[2]);
-        //     }
-        // }
-
-        // // create vertex buffer object (VBO) for the indices for the lines
-        // this.linesBuffer = new vbo.Indices(gl, { "indices": lines } );
-
-    };  
+    }; 
 
     // draw method: activate buffers and issue WebGL draw() method
     ParametricSurface.prototype.draw = function(gl,program) {
-    
-        // window.console.log("ParametricSurface.draw() not implemented yet.")
 
         // bind the attribute buffers
         program.use();
         this.coordsBuffer.bind(gl, program, "vertexPosition");
  
-        // draw the vertices as points
+        // draw the vertices as specified in the drawStyle
         switch (this.drawStyle) {
         case "points":
             gl.drawArrays(gl.POINTS, 0, this.coordsBuffer.numVertices()); 
             break;
         case "faces":
-
-            // gl.drawArrays(gl.POINTS, 0, this.coordsBuffer.numVertices()); 
-
             this.trianglesBuffer.bind(gl);
             gl.drawElements(gl.TRIANGLES, this.trianglesBuffer.numIndices(), gl.UNSIGNED_SHORT, 0);
-            // gl.drawElements(gl.TRIANGLES, 24, gl.UNSIGNED_SHORT, 0);
-            window.console.log("DRAW FACES DONE");
             break;
         case "lines":
-            window.console.log("ParametricSurface: draw style " + this.drawStyle + " not implemented.");
-            // this.linesBuffer.bind(gl);
-            // gl.drawElements(gl.LINES, this.trianglesBuffer.numIndices(), gl.UNSIGNED_SHORT, 0);
+            this.linesBuffer.bind(gl);
+            gl.drawElements(gl.LINES, this.linesBuffer.numIndices(), gl.UNSIGNED_SHORT, 0);
             break;
         default:
             window.console.log("ParametricSurface: draw style " + this.drawStyle + " not implemented.");
+            break;
         }
     };
         

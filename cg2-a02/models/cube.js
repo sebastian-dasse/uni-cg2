@@ -43,10 +43,13 @@ define(["vbo"],
     "use strict";
     
     // constructor, takes WebGL context object as argument
-    var Cube = function(gl) {
-    
+    var Cube = function(gl, config) {
         
         window.console.log("Creating a unit Cube."); 
+
+        // read the configuration parameters
+        config = config || {};
+        this.drawStyle = config.drawStyle || "faces";
     
         // generate points and store in an array
         var coords = [ 
@@ -96,27 +99,15 @@ define(["vbo"],
                                                     "data": coords 
                                                   } );
 
-        // var triangles = [
-        //                    0,  1,  2,   0,  2,  3,  // front
-        //                    4,  5,  6,   4,  6,  7,  // back
-        //                    8,  9, 10,   8, 10, 11,  // left
-        //                   12, 13, 14,  12, 14, 15,  // right
-        //                   16, 17, 18,  16, 18, 19,  // top
-        //                   20, 21, 22,  20, 22, 23   // bottom
-        //                 ];
-
         var triangles = [];
         for (var i = 0; i < this.numVertices; i += 4) {
-            triangles.push(i + 0, i + 1, i + 2,  
-                           i + 0, i + 2, i + 3);
+            triangles.push(i, i + 1, i + 2,  
+                           i, i + 2, i + 3);
         }
 
         // create vertex buffer object (VBO) for the indices
         this.trianglesBuffer = new vbo.Indices(gl, { "indices": triangles } );
-        console.log("cube: " + this.trianglesBuffer.numIndices());
 
-        // TODO: geht es eleganter? <<< ???
-        // generate vertex colors and store in an array
         var colors = [];
         for (var i = 0; i < 8; i++) {
             colors.push(1, 0, 0, 1);
@@ -134,6 +125,13 @@ define(["vbo"],
                                                     "data": colors 
                                                   } );
         
+        var lines = [0, 1,  1, 2,  2, 3,  3, 0, 
+                     4, 5,  5, 6,  6, 7,  7, 4, 
+                     0, 4,  1, 5,  2, 6,  3, 7];
+
+        // create vertex buffer object (VBO) for the lines
+        this.linesBuffer = new vbo.Indices(gl, { "indices": lines });
+
     };
 
     // draw method: activate buffers and issue WebGL draw() method
@@ -143,22 +141,25 @@ define(["vbo"],
         program.use();
         
         this.coordsBuffer.bind(gl, program, "vertexPosition");
-        
-        this.trianglesBuffer.bind(gl);
-        
         this.colorsBuffer.bind(gl, program, "vertexColor");
-                
-        // draw the vertices as points
-        // gl.drawArrays(gl.POINTS, 0, this.coordsBuffer.numVertices());
-
-        // connect the vertices with triangles
-        gl.drawElements(gl.TRIANGLES, this.trianglesBuffer.numIndices(), gl.UNSIGNED_SHORT, 0);
         
-        // TODO: kann man das eleganter mit einer Schleife lösen?  <<<<<< ???
-        // var numIndices = this.trianglesBuffer.numIndices()
-        // for (var i = 0; i < numIndices / 6; i++) {
-        //     gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, i);
-        // }
+        // draw the vertices as specified in the drawStyle
+        switch (this.drawStyle) {
+        case "points":
+            gl.drawArrays(gl.POINTS, 0, this.coordsBuffer.numVertices()); 
+            break;
+        case "faces":
+            this.trianglesBuffer.bind(gl);
+            gl.drawElements(gl.TRIANGLES, this.trianglesBuffer.numIndices(), gl.UNSIGNED_SHORT, 0);
+            break;
+        case "lines":
+            this.linesBuffer.bind(gl);
+            gl.drawElements(gl.LINES, this.linesBuffer.numIndices(), gl.UNSIGNED_SHORT, 0); 
+            break;
+        default:
+            window.console.log("Cube: draw style " + this.drawStyle + " not implemented.");
+            break;
+        }
          
     };
         

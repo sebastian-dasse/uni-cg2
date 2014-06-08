@@ -27,45 +27,50 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
                                         shaders.getFragmentShader("red") );
         this.programs.vertexColor = new Program(gl, 
                                                 shaders.getVertexShader("vertex_color"), 
-                                                shaders.getFragmentShader("vertex_color") );   
-
+                                                shaders.getFragmentShader("vertex_color") );
+        this.programs.black = new Program(gl, 
+                                          shaders.getVertexShader("unicolor"), 
+                                          shaders.getFragmentShader("unicolor") );
 
         
         // create some objects to be drawn in this scene
         this.triangle  = new Triangle(gl);
-        this.cube      = new Cube(gl); 
-        // this.band      = new Band(gl, {height: 0.4, drawStyle: "points"});
-        // this.band      = new Band(gl, {height: 0.4, drawStyle: "faces"});
-        this.band      = new Band(gl, {height: 0.4, drawStyle: "lines"});
+        // this.triangle  = new Triangle(gl, { "drawStyle": "lines" });
+        this.cube      = new Cube(gl);
+        // this.cube      = new Cube(gl, { "drawStyle": "faces" });
+        this.bandSolid  = new Band(gl, {height: 0.4, drawStyle: "faces"});
+        this.bandWiref  = new Band(gl, {height: 0.4, drawStyle: "lines"});
 
         // create a parametric surface to be drawn in this scene
         var positionFunc = function(u,v) {
             return [ 0.5 * Math.sin(u) * Math.cos(v),
                      0.3 * Math.sin(u) * Math.sin(v),
                      0.9 * Math.cos(u) ];
-        };
+        }; // ellipsoid
         // var positionFunc = function(u,v) {
         //     return [ 0.9 * Math.sin(u) * Math.cos(v),
         //              0.9 * Math.sin(u) * Math.sin(v),
         //              0.9 * Math.cos(u) ];
-        // };
+        // }; // sphere
         // var positionFunc = function(u,v) {
         //     return [ 0.1 * u,
         //              0.1 * v,
         //              0.5 ];
-        // };
+        // }; // grid
         var config = {
             "uMin": -Math.PI, 
             "uMax":  Math.PI, 
-            "vMin": -Math.PI, // -Math.PI / 2  <-- besser ???
-            "vMax":  Math.PI, //  Math.PI / 2  <-- besser ???
-            // "uSegments": 40,
-            // "vSegments": 20,
-            // "uSegments": 6,
-            // "vSegments": 5, 
+            "vMin": -Math.PI/2, // -Math.PI / 2  <-- besser ???
+            "vMax":  Math.PI/2, //  Math.PI / 2  <-- besser ???
+            "uSegments": 40,
+            "vSegments": 20,
+            // "uSegments": 4,
+            // "vSegments": 2, 
             "drawStyle": "faces"
         };
-        this.ellipsoid = new ParametricSurface(gl, positionFunc, config);
+        this.ellipsoidSolid = new ParametricSurface(gl, positionFunc, config);
+        config.drawStyle = "lines";
+        this.ellipsoidWiref = new ParametricSurface(gl, positionFunc, config);
 
         // initial position of the camera
         this.cameraTransformation = mat4.lookAt([0,0.5,3], [0,0,0], [0,1,0]);
@@ -79,8 +84,10 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
         this.drawOptions = { "Perspective Projection": false, 
                              "Show Triangle": false,
                              "Show Cube": false,
-                             "Show Band": false,
-                             "Show Ellipsoid": true
+                             "Show Solid Band": false,
+                             "Show Wireframe Band": false,
+                             "Show Solid Ellipsoid": true, 
+                             "Show Wireframe Ellipsoid": true
                              };                       
     };
 
@@ -90,6 +97,11 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
         // just a shortcut
         var gl = this.gl;
 
+        // prevent Z fighting
+        gl.enable(gl.POLYGON_OFFSET_FILL);
+        gl.polygonOffset(1.0, 1.0);
+
+
         // set up the projection matrix, depending on the canvas size
         var aspectRatio = gl.drawingBufferWidth / gl.drawingBufferHeight;
         var projection = this.drawOptions["Perspective Projection"] ?
@@ -97,11 +109,14 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
                              mat4.ortho(-aspectRatio, aspectRatio, -1,1, 0.01, 100);
 
 
+        var uniColorBlack = [0, 0, 0, 1];
+
         // set the uniform variables for all used programs
         for(var p in this.programs) {
             this.programs[p].use();
             this.programs[p].setUniform("projectionMatrix", "mat4", projection);
             this.programs[p].setUniform("modelViewMatrix", "mat4", this.transformation);
+            this.programs[p].setUniform("uniColor", "vec4", uniColorBlack);
         }
         
         // clear color and depth buffers
@@ -121,11 +136,17 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
             // this.cube.draw(gl, this.programs.red);
             this.cube.draw(gl, this.programs.vertexColor);
         }
-        if(this.drawOptions["Show Band"]) {    
-            this.band.draw(gl, this.programs.red);
+        if(this.drawOptions["Show Solid Band"]) { 
+            this.bandSolid.draw(gl, this.programs.red);
         }
-        if(this.drawOptions["Show Ellipsoid"]) {    
-            this.ellipsoid.draw(gl, this.programs.red);
+        if(this.drawOptions["Show Wireframe Band"]) { 
+            this.bandWiref.draw(gl, this.programs.black);
+        }
+        if(this.drawOptions["Show Solid Ellipsoid"]) { 
+            this.ellipsoidSolid.draw(gl, this.programs.red);
+        }
+        if(this.drawOptions["Show Wireframe Ellipsoid"]) { 
+            this.ellipsoidWiref.draw(gl, this.programs.black);
         }
     };
 

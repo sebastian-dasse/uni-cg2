@@ -90,9 +90,8 @@ define(["vbo"],
         // bind the attribute buffers
         program.use();
         this.coordsBuffer.bind(gl, program, "vertexPosition");
-        
  
-        // draw the vertices as points
+        // draw the vertices as specified in the drawStyle
         switch (this.drawStyle) {
         case "points":
             gl.drawArrays(gl.POINTS, 0, this.coordsBuffer.numVertices()); 
@@ -103,10 +102,11 @@ define(["vbo"],
             break;
         case "lines":
             this.linesBuffer.bind(gl);
-            gl.drawElements(gl.LINES, this.trianglesBuffer.numIndices(), gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.LINES, this.linesBuffer.numIndices(), gl.UNSIGNED_SHORT, 0);
             break;
         default:
             window.console.log("Band: draw style " + this.drawStyle + " not implemented.");
+            break;
         }
          
     };
