@@ -64,9 +64,8 @@ define(["vbo"],
                                                   } );
 
         var triangles = [];
-        for (var i = 0; i < 2*segments; i += 2) {
-            triangles.push(i + 0, i + 1, i + 2,  
-                           i + 3, i + 2, i + 1);
+        for (var i = 0; i < 2*segments; i++) {
+            triangles.push(i, i + 1, i + 2);
         }
 
         // create vertex buffer object (VBO) for the indices for the triangles
@@ -74,9 +73,9 @@ define(["vbo"],
 
         var lines = [];
         for (var i = 0; i < 2*segments; i += 2) {
-            lines.push(i + 0, i + 1, 
-                           i + 0, i + 2, 
-                           i + 1, i + 3);
+            lines.push(i    , i + 1, 
+                       i    , i + 2, 
+                       i + 1, i + 3);
         }
 
         // create vertex buffer object (VBO) for the indices for the lines
