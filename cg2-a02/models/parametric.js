@@ -86,8 +86,8 @@ define(["vbo"],
         }
         // lines for last column
         var k = uSegments * (vSegments + 1);
-        for(var j = 0; j <= vSegments; j++) {
-            lines.push(k, k + j);
+        for(var j = 0; j < vSegments; j++) {
+            lines.push(k + j, k + j + 1);
         }
 
         // create vertex buffer object (VBO) for the indices for the lines

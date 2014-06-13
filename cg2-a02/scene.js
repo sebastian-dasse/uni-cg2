@@ -57,6 +57,36 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
         //              0.1 * v,
         //              0.5 ];
         // }; // grid
+        // var positionFunc = function(u,v) {
+        //     return [ 0.3 * u,
+        //              0.3 * v,
+        //              0.3 * (u*u*u - 3*u*v*v) ];
+        // }; // monkey saddle
+        // var positionFunc = function(u,v) {
+        //     var pillowWidth = 0.5;
+        //     return [ 0.3 * Math.cos(u),
+        //              0.3 * Math.cos(v),
+        //              0.3 * pillowWidth * Math.sin(u)*Math.sin(v) ];
+        // }; // pillow
+        // var positionFunc = function(u,v) {
+        //     return [ 0.2 * 2 * Math.sin(3 * u) / (2 + Math.cos(v)),
+        //              0.2 * 2 * (Math.sin(u) + 2 * Math.sin(2 * u)) / (2 + Math.cos(v + 2 * Math.PI/3)),
+        //              0.2 * (Math.cos(u) - 2 * Math.cos(2 * u)) * (2 + Math.cos(v)) * (2 * Math.cos(v + 2 * Math.PI/3)) / 4 ];
+        // }; // tranguloid trefoil
+        // var positionFunc = function(u,v) {
+        //     return [ 0.05 * u * Math.cos(Math.cos(u)) * Math.cos(v),
+        //              0.05 * u * Math.cos(Math.cos(u)) * Math.sin(v),
+        //              0.05 * u * Math.sin(Math.cos(u)) ];
+        // }; // wellenkugel
+        
+        // var positionFunc = function(u,v) {
+        //     var a = 0.5;
+        //     var b = 0.5;
+        //     var h = Math.pow (Math.E, u / (6 * Math.PI));
+        //     return [ a * (1 - h) * Math.cos(u) * Math.cos( 0.5 * v) * Math.cos(v),
+        //              (1 - Math.pow (Math.E, u / (b * Math.PI)) - Math.sin(v) + h * Math.sin(v)),
+        //              a * (-1 + h) * Math.sin(u) * Math.cos(0.5 * v) * Math.cos(0.5 * v) ];
+        // }; // schnecke -- TODO: not working
         var config = {
             "uMin": -Math.PI, 
             "uMax":  Math.PI, 
@@ -67,7 +97,62 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
             // "uSegments": 4,
             // "vSegments": 2, 
             "drawStyle": "faces"
-        };
+        }; // for ellipsoid
+        // var config = {
+        //     "uMin": -1, 
+        //     "uMax":  1, 
+        //     "vMin": -1,
+        //     "vMax":  1,
+        //     "uSegments": 40,
+        //     "vSegments": 20,
+        //     // "uSegments": 4,
+        //     // "vSegments": 2, 
+        //     "drawStyle": "faces"
+        // }; // for monkey saddle
+        // var config = {
+        //     "uMin":  0, 
+        //     "uMax":  Math.PI, 
+        //     "vMin": -Math.PI,
+        //     "vMax":  Math.PI,
+        //     "uSegments": 40,
+        //     "vSegments": 20,
+        //     // "uSegments": 4,
+        //     // "vSegments": 2, 
+        //     "drawStyle": "faces"
+        // }; // for pillow
+        // var config = {
+        //     "uMin": -Math.PI, 
+        //     "uMax":  Math.PI, 
+        //     "vMin": -Math.PI,
+        //     "vMax":  Math.PI,
+        //     "uSegments": 200,
+        //     "vSegments": 100,
+        //     // "uSegments": 4,
+        //     // "vSegments": 2, 
+        //     "drawStyle": "faces"
+        // }; // for tranguloid trefoil
+        // var config = {
+        //     "uMin": 0, 
+        //     "uMax": 14.5, 
+        //     "vMin": 0,
+        //     "vMax": Math.PI,
+        //     "uSegments": 100,
+        //     "vSegments": 50,
+        //     // "uSegments": 4,
+        //     // "vSegments": 2, 
+        //     "drawStyle": "faces"
+        // }; // for wellenkugel
+        // var config = {
+        //     "uMin": 0, 
+        //     "uMax": 6 * Math.PI, 
+        //     "vMin": 0,
+        //     "vMax": 2 * Math.PI,
+        //     "uSegments": 200,
+        //     "vSegments": 100,
+        //     // "uSegments": 4,
+        //     // "vSegments": 2, 
+        //     "drawStyle": "faces"
+        // }; // for schnecke
         this.ellipsoidSolid = new ParametricSurface(gl, positionFunc, config);
         config.drawStyle = "lines";
         this.ellipsoidWiref = new ParametricSurface(gl, positionFunc, config);
