@@ -8,8 +8,8 @@
 
 /* requireJS module definition */
 define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "models/cube",
-        "models/parametric"], 
-       (function(glmatrix, Program, shaders, Band, Triangle, Cube, ParametricSurface ) {
+        "models/parametric", "models/robot"], 
+       (function(glmatrix, Program, shaders, Band, Triangle, Cube, ParametricSurface, Robot ) {
 
     "use strict";
     
@@ -33,7 +33,9 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
                                           shaders.getFragmentShader("unicolor") );
 
         
+        
         // create some objects to be drawn in this scene
+
         this.triangle  = new Triangle(gl);
         // this.triangle  = new Triangle(gl, { "drawStyle": "lines" });
         this.cube      = new Cube(gl);
@@ -157,6 +159,16 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
         config.drawStyle = "lines";
         this.ellipsoidWiref = new ParametricSurface(gl, positionFunc, config);
 
+
+
+        //-- ROBOT --------------------------------------
+
+        var robotConfig = {};
+        this.robot = new Robot(gl, this.programs, robotConfig);
+
+        //-----------------------------------------------
+
+
         // initial position of the camera
         this.cameraTransformation = mat4.lookAt([0,0.5,3], [0,0,0], [0,1,0]);
 
@@ -171,10 +183,13 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
                              "Show Cube": false,
                              "Show Solid Band": false,
                              "Show Wireframe Band": false,
-                             "Show Solid Ellipsoid": true, 
-                             "Show Wireframe Ellipsoid": true
-                             };                       
+                             "Show Solid Ellipsoid": false, 
+                             "Show Wireframe Ellipsoid": false, 
+                             "Show Robot": true
+                             };
     };
+
+
 
     // the scene's draw method draws whatever the scene wants to draw
     Scene.prototype.draw = function() {
@@ -232,6 +247,9 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
         }
         if(this.drawOptions["Show Wireframe Ellipsoid"]) { 
             this.ellipsoidWiref.draw(gl, this.programs.black);
+        }
+        if(this.drawOptions["Show Robot"]) { 
+            this.robot.draw(gl, undefined, this.transformation);
         }
     };
 
