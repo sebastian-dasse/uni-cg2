@@ -80,15 +80,15 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
         //              0.05 * u * Math.cos(Math.cos(u)) * Math.sin(v),
         //              0.05 * u * Math.sin(Math.cos(u)) ];
         // }; // wellenkugel
-        
         // var positionFunc = function(u,v) {
-        //     var a = 0.5;
-        //     var b = 0.5;
-        //     var h = Math.pow (Math.E, u / (6 * Math.PI));
-        //     return [ a * (1 - h) * Math.cos(u) * Math.cos( 0.5 * v) * Math.cos(v),
-        //              (1 - Math.pow (Math.E, u / (b * Math.PI)) - Math.sin(v) + h * Math.sin(v)),
-        //              a * (-1 + h) * Math.sin(u) * Math.cos(0.5 * v) * Math.cos(0.5 * v) ];
-        // }; // schnecke -- TODO: not working
+        //     var a = 2.4;
+        //     var b = 3.2;
+        //     var h = Math.pow(Math.E, u / (6 * Math.PI));
+        //     return [ 0.15 * a * (1 - h) * Math.cos(u) * Math.cos( 0.5 * v) * Math.cos(0.5 * v),
+        //              0.15 * (1 - Math.pow(Math.E, u / (b * Math.PI)) - Math.sin(v) + h * Math.sin(v)),
+        //              0.15 * a * (-1 + h) * Math.sin(u) * Math.cos(0.5 * v) * Math.cos(0.5 * v) ];
+        // }; // schnecke
+
         var config = {
             "uMin": -Math.PI, 
             "uMax":  Math.PI, 
@@ -145,12 +145,12 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
         //     "drawStyle": "faces"
         // }; // for wellenkugel
         // var config = {
-        //     "uMin": 0, 
+        //     "uMin": 0.0001, 
         //     "uMax": 6 * Math.PI, 
         //     "vMin": 0,
         //     "vMax": 2 * Math.PI,
-        //     "uSegments": 200,
-        //     "vSegments": 100,
+        //     "uSegments": 100,
+        //     "vSegments": 50,
         //     // "uSegments": 4,
         //     // "vSegments": 2, 
         //     "drawStyle": "faces"
