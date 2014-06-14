@@ -88,6 +88,13 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
         //              0.15 * (1 - Math.pow(Math.E, u / (b * Math.PI)) - Math.sin(v) + h * Math.sin(v)),
         //              0.15 * a * (-1 + h) * Math.sin(u) * Math.cos(0.5 * v) * Math.cos(0.5 * v) ];
         // }; // schnecke
+        // var positionFunc = function(u,v) {
+        //     var r0 = 0.5;  // the main radius of the torus
+        //     var r1 = r0/2; // the thickness of the torus
+        //     return [ 1 * (r0 + r1 * Math.cos(v)) * Math.cos(u),
+        //              1 * (r0 + r1 * Math.cos(v)) * Math.sin(u),
+        //              1 * r1 * Math.sin(v) ];
+        // }; // torus
 
         var config = {
             "uMin": -Math.PI, 
@@ -106,10 +113,9 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
         //     "vMin": -1,
         //     "vMax":  1,
         //     "uSegments": 40,
-        //     "vSegments": 20,
+        //     "vSegments": 20
         //     // "uSegments": 4,
-        //     // "vSegments": 2, 
-        //     "drawStyle": "faces"
+        //     // "vSegments": 2
         // }; // for monkey saddle
         // var config = {
         //     "uMin":  0, 
@@ -117,10 +123,9 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
         //     "vMin": -Math.PI,
         //     "vMax":  Math.PI,
         //     "uSegments": 40,
-        //     "vSegments": 20,
+        //     "vSegments": 20
         //     // "uSegments": 4,
-        //     // "vSegments": 2, 
-        //     "drawStyle": "faces"
+        //     // "vSegments": 2
         // }; // for pillow
         // var config = {
         //     "uMin": -Math.PI, 
@@ -128,10 +133,9 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
         //     "vMin": -Math.PI,
         //     "vMax":  Math.PI,
         //     "uSegments": 200,
-        //     "vSegments": 100,
+        //     "vSegments": 100
         //     // "uSegments": 4,
-        //     // "vSegments": 2, 
-        //     "drawStyle": "faces"
+        //     // "vSegments": 2
         // }; // for tranguloid trefoil
         // var config = {
         //     "uMin": 0, 
@@ -139,10 +143,9 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
         //     "vMin": 0,
         //     "vMax": Math.PI,
         //     "uSegments": 100,
-        //     "vSegments": 50,
+        //     "vSegments": 50
         //     // "uSegments": 4,
-        //     // "vSegments": 2, 
-        //     "drawStyle": "faces"
+        //     // "vSegments": 2
         // }; // for wellenkugel
         // var config = {
         //     "uMin": 0.0001, 
@@ -150,11 +153,21 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
         //     "vMin": 0,
         //     "vMax": 2 * Math.PI,
         //     "uSegments": 100,
-        //     "vSegments": 50,
+        //     "vSegments": 50
         //     // "uSegments": 4,
-        //     // "vSegments": 2, 
-        //     "drawStyle": "faces"
+        //     // "vSegments": 2
         // }; // for schnecke
+        // var config = {
+        //     "uMin": -Math.PI, 
+        //     "uMax":  Math.PI, 
+        //     "vMin": -Math.PI,
+        //     "vMax":  Math.PI, 
+        //     "uSegments": 40,
+        //     "vSegments": 20
+        //     // "uSegments": 4,
+        //     // "vSegments": 2
+        // }; // for torus
+        config.drawStyle = "faces";
         this.ellipsoidSolid = new ParametricSurface(gl, positionFunc, config);
         config.drawStyle = "lines";
         this.ellipsoidWiref = new ParametricSurface(gl, positionFunc, config);
@@ -264,11 +277,23 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
         
         // manipulate the corresponding matrix, depending on the name of the joint
         switch(rotationAxis) {
+            case "worldX": 
+                mat4.rotate(this.transformation, angle, [1,0,0]);
+                break;
             case "worldY": 
                 mat4.rotate(this.transformation, angle, [0,1,0]);
                 break;
-            case "worldX": 
-                mat4.rotate(this.transformation, angle, [1,0,0]);
+            case "worldZ": 
+                console.log("try Z");
+                mat4.rotate(this.transformation, angle, [0,0,1]);
+                break;
+            case "armUpperRX": 
+            case "armUpperRZ": 
+            case "armLowerRX": 
+            case "handR": 
+            case "headY": 
+            case "eyesZ": 
+                this.robot.rotate(rotationAxis, angle);
                 break;
             default:
                 window.console.log("axis " + rotationAxis + " not implemented.");
