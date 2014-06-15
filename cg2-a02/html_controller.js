@@ -62,6 +62,8 @@ define(["jquery"],
 
             // set animation speed
             animation.customSpeed = parseFloat($("#anim_Speed").attr("value"));
+            animation.direction = $("#anim_Direction").attr("checked") ? -1 : 1;
+            animation.isComplex = $("#anim_Type_Toggle").attr("checked");
             
             // modify the drawOptions attribute depending on checkboxes
             for(var o in scene.drawOptions) {
@@ -77,12 +79,14 @@ define(["jquery"],
         // set initial values for the input elements
         $("#anim_Toggle").attr("checked", undefined);
         $("#anim_Speed").attr("value", 20);
+        $("#anim_Direction").attr("value", 1);
+        $("#anim_Type_Toggle").attr("checked", true);
         
         // create one input element for each attribute in scene.drawOptions
         for(var o in scene.drawOptions) {
             
             // put together valid HTML code for a new table row 
-            var newRow = '<tr><td>'+o+'</td>'+
+            var newRow = '<tr><td>'+o+':</td>'+
                          '<td><input id="'+drawOptionId(o)+'" type="checkbox" class="inputParam"></input></td></tr>\n';
                          
             // insert HTML code after the last table row so far.

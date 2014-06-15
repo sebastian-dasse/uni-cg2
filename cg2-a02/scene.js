@@ -29,8 +29,8 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
                                                 shaders.getVertexShader("vertex_color"), 
                                                 shaders.getFragmentShader("vertex_color") );
         this.programs.uniColor = new Program(gl, 
-                                          shaders.getVertexShader("unicolor"), 
-                                          shaders.getFragmentShader("unicolor") );
+                                             shaders.getVertexShader("unicolor"), 
+                                             shaders.getFragmentShader("unicolor") );
 
         
         
@@ -280,8 +280,7 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
         }
         if(this.drawOptions["Show Wiref Ellipsoid"]) { 
             this.ellipsoidWiref.draw(gl, this.programs.uniColor);
-        }
-        
+        }        
         if(this.drawOptions["Show Pillow"]) { 
             this.pillowSolid.draw(gl, this.programs.red);
             this.pillowWiref.draw(gl, this.programs.uniColor);
@@ -306,7 +305,6 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
             this.schneckeSolid.draw(gl, this.programs.red);
             this.schneckeWiref.draw(gl, this.programs.uniColor);
         }
-
         if(this.drawOptions["Show Robot"]) { 
             this.robot.draw(gl, undefined, this.transformation);
         }
@@ -350,6 +348,12 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
             case "eyesZ": 
             case "eyesScaleZ": 
                 this.robot.rotate(rotationAxis, angle);
+                break;
+            case "resetWorld": 
+                this.transformation = mat4.create(this.cameraTransformation);
+                break;
+            case "resetRobot": 
+                this.robot = new Robot(this.gl, this.programs);
                 break;
             default:
                 window.console.log("axis " + rotationAxis + " not implemented.");

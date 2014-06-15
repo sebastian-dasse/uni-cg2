@@ -35,28 +35,82 @@ define(["jquery", "gl-matrix", "webgl-debug", "animation", "scene", "html_contro
 
     "use strict";
 
+    // /*
+    //  * create an animation that rotates the scene around 
+    //  * the Y axis over time. 
+    //  */
+    // var makeAnimation = function(scene) {
+    
+    //     // create animation to rotate the scene
+    //     var animation = new Animation( (function(t, deltaT) {
+
+    //         // rotation angle, depending on animation time
+    //         var angle = deltaT/1000 * animation.customSpeed; // in degrees
+
+    //         // ask the scene to rotate around Y axis
+    //         scene.rotate("worldY", angle); 
+                        
+    //         // (re-) draw the scene
+    //         scene.draw();
+            
+    //     } )); // end animation callback
+
+    //     // set an additional attribute that can be controlled from the outside
+    //     animation.customSpeed = 20; 
+
+    //     return animation;
+    
+    // };
+
     /*
-     * create an animation that rotates the scene around 
-     * the Y axis over time. 
+     * create an animation that does funny things with the robot
      */
     var makeAnimation = function(scene) {
     
         // create animation to rotate the scene
         var animation = new Animation( (function(t, deltaT) {
 
-            // rotation angle, depending on animation time
-            var angle = deltaT/1000 * animation.customSpeed; // in degrees
+            if (!animation.isComplex) { 
+                
+                // rotation angle, depending on animation time
+                var angle = deltaT/1000 * animation.customSpeed * animation.direction; // in degrees
+                
+                // ask the scene to rotate around Y axis
+                scene.rotate("worldY", angle); 
+            
+            } else {
+                var worldAngle = 2 * (t/50000)*(t/50000) * Math.sin(Math.PI * t/10000) * Math.sin(Math.PI * t/20000);
+                var headAngle = -1 * deltaT/1000 * Math.cos(Math.PI * t/10000) * animation.customSpeed; // in degrees
+                var armUpperRZAngle = 0.5 * deltaT/1000 * -Math.sin(Math.PI * t/10000) * animation.customSpeed; // in degrees
+                var armUpperRXAngle = 0.5 * deltaT/1000 * -Math.sin(Math.PI * t/10000) * animation.customSpeed; // in degrees
+                var armLowerRXAngle = deltaT/1000 *  -Math.sin(Math.PI * t/10000) * animation.customSpeed; // in degrees
+                var handRGrabAngle = deltaT/1000 * -Math.sin(Math.PI * t/1000) * Math.cos(Math.PI * t/10000) * animation.customSpeed; // in degrees
+                var eyesScaleZAngle = -0.1 *180/Math.PI * deltaT/1000 * Math.sin(Math.PI * t/1000) * animation.customSpeed;
 
-            // ask the scene to rotate around Y axis
-            scene.rotate("worldY", angle); 
+                scene.rotate("worldY", worldAngle); 
+                scene.rotate("headY", headAngle); 
+                scene.rotate("armUpperRZ", armUpperRZAngle); 
+                scene.rotate("armUpperRX", armUpperRXAngle); 
+                scene.rotate("armLowerRX", armLowerRXAngle); 
+                scene.rotate("handRGrab", handRGrabAngle); 
+                scene.rotate("handRY", 8 * handRGrabAngle); 
+                scene.rotate("handLY", 5); 
+                scene.rotate("eyesZ", 15); 
+                
+                if (t > 3000 && t < 4500) {
+                    scene.rotate("eyesScaleZ", eyesScaleZAngle);
+                }
+            }
                         
             // (re-) draw the scene
             scene.draw();
             
         } )); // end animation callback
 
-        // set an additional attribute that can be controlled from the outside
+        // set additional attributes that can be controlled from the outside
         animation.customSpeed = 20; 
+        animation.direction = 1; 
+        animation.isComplex = true; 
 
         return animation;
     
@@ -83,7 +137,7 @@ define(["jquery", "gl-matrix", "webgl-debug", "animation", "scene", "html_contro
         var throwOnGLError = function(err, funcName, args) {
             throw WebGLDebugUtils.glEnumToString(err) + " was caused by call to: " + funcName;
         };
-        var gl=WebGLDebugUtils.makeDebugContext(gl, throwOnGLError);
+        // var gl=WebGLDebugUtils.makeDebugContext(gl, throwOnGLError); // <<<------------<< << << comment out for smooth animations <<
         
         return gl;
     };
@@ -137,7 +191,10 @@ define(["jquery", "gl-matrix", "webgl-debug", "animation", "scene", "html_contro
              'j': {axis: "eyesZ", angle:  5.0}, 
              'J': {axis: "eyesZ", angle: -5.0}, 
              'k': {axis: "eyesScaleZ", angle:  0.2*180/Math.PI},  // "angle" is actually the offset for the scaling
-             'K': {axis: "eyesScaleZ", angle: -0.2*180/Math.PI}
+             'K': {axis: "eyesScaleZ", angle: -0.2*180/Math.PI}, 
+
+             '#': {axis: "resetWorld"}, 
+             '\'': {axis: "resetRobot"}
         };
 
         // create HtmlController that takes care of all interaction
