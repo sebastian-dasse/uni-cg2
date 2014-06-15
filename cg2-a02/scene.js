@@ -28,7 +28,7 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
         this.programs.vertexColor = new Program(gl, 
                                                 shaders.getVertexShader("vertex_color"), 
                                                 shaders.getFragmentShader("vertex_color") );
-        this.programs.black = new Program(gl, 
+        this.programs.uniColor = new Program(gl, 
                                           shaders.getVertexShader("unicolor"), 
                                           shaders.getFragmentShader("unicolor") );
 
@@ -222,7 +222,8 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
                              "Show Tranguloid Trefoil": false, 
                              "Show Schnecke": false, 
                              "Show Robot": true
-                             }; };
+        };
+    };
 
 
 
@@ -243,14 +244,12 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
                              mat4.ortho(-aspectRatio, aspectRatio, -1,1, 0.01, 100);
 
 
-        var uniColorBlack = [0, 0, 0, 1];
-
         // set the uniform variables for all used programs
         for(var p in this.programs) {
             this.programs[p].use();
             this.programs[p].setUniform("projectionMatrix", "mat4", projection);
             this.programs[p].setUniform("modelViewMatrix", "mat4", this.transformation);
-            this.programs[p].setUniform("uniColor", "vec4", uniColorBlack);
+            this.programs[p].setUniform("uniColor", "vec4", [0, 0, 0, 1]); // set uniColor to black
         }
         
         // clear color and depth buffers
@@ -274,38 +273,38 @@ define(["gl-matrix", "program", "shaders", "models/band", "models/triangle", "mo
             this.bandSolid.draw(gl, this.programs.red);
         }
         if(this.drawOptions["Show Wiref Band"]) { 
-            this.bandWiref.draw(gl, this.programs.black);
+            this.bandWiref.draw(gl, this.programs.uniColor);
         }
         if(this.drawOptions["Show Solid Ellipsoid"]) { 
             this.ellipsoidSolid.draw(gl, this.programs.red);
         }
         if(this.drawOptions["Show Wiref Ellipsoid"]) { 
-            this.ellipsoidWiref.draw(gl, this.programs.black);
+            this.ellipsoidWiref.draw(gl, this.programs.uniColor);
         }
         
         if(this.drawOptions["Show Pillow"]) { 
             this.pillowSolid.draw(gl, this.programs.red);
-            this.pillowWiref.draw(gl, this.programs.black);
+            this.pillowWiref.draw(gl, this.programs.uniColor);
         }
         if(this.drawOptions["Show Torus"]) { 
             this.torusSolid.draw(gl, this.programs.red);
-            this.torusWiref.draw(gl, this.programs.black);
+            this.torusWiref.draw(gl, this.programs.uniColor);
         }
         if(this.drawOptions["Show Monkey Saddle"]) { 
             this.monkeySaddleSolid.draw(gl, this.programs.red);
-            this.monkeySaddleWiref.draw(gl, this.programs.black);
+            this.monkeySaddleWiref.draw(gl, this.programs.uniColor);
         }
         if(this.drawOptions["Show Wellenkugel"]) { 
             this.wellenkugelSolid.draw(gl, this.programs.red);
-            this.wellenkugelWiref.draw(gl, this.programs.black);
+            this.wellenkugelWiref.draw(gl, this.programs.uniColor);
         }
         if(this.drawOptions["Show Tranguloid Trefoil"]) { 
             this.tranguloidTrefoilSolid.draw(gl, this.programs.red);
-            this.tranguloidTrefoilWiref.draw(gl, this.programs.black);
+            this.tranguloidTrefoilWiref.draw(gl, this.programs.uniColor);
         }
         if(this.drawOptions["Show Schnecke"]) { 
             this.schneckeSolid.draw(gl, this.programs.red);
-            this.schneckeWiref.draw(gl, this.programs.black);
+            this.schneckeWiref.draw(gl, this.programs.uniColor);
         }
 
         if(this.drawOptions["Show Robot"]) { 

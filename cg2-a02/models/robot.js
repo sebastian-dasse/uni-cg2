@@ -21,7 +21,7 @@ define(["scene_node", "gl-matrix", "models/band", "models/cube", "models/paramet
         if (!programs) console.log("no programs");
         if (!programs.red) console.log("no programs.red");
         if (!programs.vertexColor) console.log("no programs.vertexColor");
-        if (!programs.black) console.log("no programs.black");
+        if (!programs.uniColor) console.log("no programs.uniColor");
 
 
         //-- components for the robot ------------
@@ -223,36 +223,36 @@ define(["scene_node", "gl-matrix", "models/band", "models/cube", "models/paramet
         
         var neckSkin = new SceneNode("neck skin");
         neckSkin.add(bandSolid, programs.red);
-        neckSkin.add(bandWiref, programs.black);
+        neckSkin.add(bandWiref, programs.uniColor);
         mat4.scale(neckSkin.transform(), neckSize);
 
         var headSkin = new SceneNode("head skin");
         headSkin.add(cube, programs.vertexColor);
         // headSkin.add(ellipsoidSolid, programs.red);
-        // headSkin.add(ellipsoidWiref, programs.black);
+        // headSkin.add(ellipsoidWiref, programs.uniColor);
         mat4.rotate(headSkin.transform(), 0.5 * Math.PI, [0, 1, 0]);
         mat4.scale(headSkin.transform(), headSize);
 
         var eyeOuterSkin = new SceneNode("eye outer");
         eyeOuterSkin.add(bandSolid, programs.red);
-        eyeOuterSkin.add(bandWiref, programs.black);
+        eyeOuterSkin.add(bandWiref, programs.uniColor);
         mat4.scale(eyeOuterSkin.transform(), eyeOuterSize);
         mat4.rotate(eyeOuterSkin.transform(), Math.PI/2, [1, 0, 0]);
 
         var eyeInnerSkin = new SceneNode("eye inner");
         eyeInnerSkin.add(ellipsoidSolid, programs.red);
-        eyeInnerSkin.add(ellipsoidWiref, programs.black);
+        eyeInnerSkin.add(ellipsoidWiref, programs.uniColor);
         mat4.scale(eyeInnerSkin.transform(), eyeInnerSize);
         // mat4.rotate(eyeInnerSkin.transform(), Math.PI/2, [1, 0, 0]);
 
         var shoulderSkin = new SceneNode("shoulder skin");
-        shoulderSkin.add(bandSolid, programs.black);
+        shoulderSkin.add(bandSolid, programs.uniColor);
         shoulderSkin.add(bandWiref, programs.red);
         mat4.rotate(shoulderSkin.transform(), 0.5 * Math.PI, [0, 0, 1]);
         mat4.scale(shoulderSkin.transform(), shoulderSize);
 
         var armUpperSkin = new SceneNode("arm upper skin");
-        armUpperSkin.add(ellipsoidSolid, programs.black);
+        armUpperSkin.add(ellipsoidSolid, programs.uniColor);
         armUpperSkin.add(ellipsoidWiref, programs.red);
         // armUpperSkin.add(cube, programs.vertexColor);
         mat4.scale(armUpperSkin.transform(), armUpperSize);
@@ -260,12 +260,12 @@ define(["scene_node", "gl-matrix", "models/band", "models/cube", "models/paramet
 
         var armJointSkin = new SceneNode("arm joint skin"); // used by multiple skeleton nodes  
         armJointSkin.add(ellipsoidSolid, programs.red);
-        armJointSkin.add(ellipsoidWiref, programs.black);
+        armJointSkin.add(ellipsoidWiref, programs.uniColor);
         mat4.rotate(armJointSkin.transform(), 0.5 * Math.PI, [0, 1, 0]);
         mat4.scale(armJointSkin.transform(), elbowSize);
 
         var armLowerSkin = new SceneNode("arm lower skin");
-        armLowerSkin.add(ellipsoidSolid, programs.black);
+        armLowerSkin.add(ellipsoidSolid, programs.uniColor);
         armLowerSkin.add(ellipsoidWiref, programs.red);
         // armLowerSkin.add(cube, programs.vertexColor);
         mat4.scale(armLowerSkin.transform(), armLowerSize);
@@ -273,14 +273,14 @@ define(["scene_node", "gl-matrix", "models/band", "models/cube", "models/paramet
 
         var wristSkin = new SceneNode("wrist skin");
         wristSkin.add(torusSolid, programs.red);
-        wristSkin.add(torusWiref, programs.black);
+        wristSkin.add(torusWiref, programs.uniColor);
         // wristSkin.add(cube, programs.vertexColor);
         mat4.scale(wristSkin.transform(), this.wristSize);
         mat4.rotate(wristSkin.transform(), 0.5 * Math.PI, [1, 0, 0]);
 
         var fingerSkin = new SceneNode("finger skin");
         // fingerSkin.add(torusSolid, programs.red);
-        // fingerSkin.add(torusWiref, programs.black);
+        // fingerSkin.add(torusWiref, programs.uniColor);
         fingerSkin.add(cube, programs.vertexColor);
         mat4.scale(fingerSkin.transform(), fingerSize);
         mat4.rotate(fingerSkin.transform(), 0.5 * Math.PI, [1, 0, 0]);
@@ -288,7 +288,7 @@ define(["scene_node", "gl-matrix", "models/band", "models/cube", "models/paramet
 
         var hatSkin = new SceneNode("hat skin");
         hatSkin.add(trangTrefSolid, programs.red);
-        hatSkin.add(trangTrefWiref, programs.black);
+        hatSkin.add(trangTrefWiref, programs.uniColor);
         // hatSkin.add(cube, programs.vertexColor);
         mat4.scale(hatSkin.transform(), hatSize);
         // mat4.rotate(hatSkin.transform(), 0.5 * Math.PI, [1, 0, 0]);
