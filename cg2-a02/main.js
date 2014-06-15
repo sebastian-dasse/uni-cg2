@@ -107,18 +107,37 @@ define(["jquery", "gl-matrix", "webgl-debug", "animation", "scene", "html_contro
              'Y': {axis: "worldY", angle: -5.0}, 
              'z': {axis: "worldZ", angle:  5.0}, 
              'Z': {axis: "worldZ", angle: -5.0}, 
+             'c': {axis: "worldScale", angle:  1}, // "angle" is actually the offset for the scaling
+             'C': {axis: "worldScale", angle: -1}, 
+             
              'q': {axis: "armUpperRZ", angle: -5.0}, 
              'Q': {axis: "armUpperRZ", angle:  5.0}, 
              'w': {axis: "armUpperRX", angle: -5.0}, 
              'W': {axis: "armUpperRX", angle:  5.0}, 
              'e': {axis: "armLowerRX", angle: -5.0}, 
              'E': {axis: "armLowerRX", angle:  5.0}, 
-             'r': {axis: "handR", angle:  5.0}, 
-             'R': {axis: "handR", angle: -5.0}, 
+             'r': {axis: "handRY", angle:  5.0}, 
+             'R': {axis: "handRY", angle: -5.0}, 
+             't': {axis: "handRGrab", angle:  5.0}, 
+             'T': {axis: "handRGrab", angle: -5.0}, 
+
+             'a': {axis: "armUpperLZ", angle:  5.0}, 
+             'A': {axis: "armUpperLZ", angle: -5.0}, 
+             's': {axis: "armUpperLX", angle: -5.0}, 
+             'S': {axis: "armUpperLX", angle:  5.0}, 
+             'd': {axis: "armLowerLX", angle: -5.0}, 
+             'D': {axis: "armLowerLX", angle:  5.0}, 
+             'f': {axis: "handLY", angle: -5.0}, 
+             'F': {axis: "handLY", angle:  5.0}, 
+             'g': {axis: "handLGrab", angle:  5.0}, 
+             'G': {axis: "handLGrab", angle: -5.0}, 
+
              'h': {axis: "headY", angle:  5.0}, 
              'H': {axis: "headY", angle: -5.0}, 
              'j': {axis: "eyesZ", angle:  5.0}, 
-             'J': {axis: "eyesZ", angle: -5.0}
+             'J': {axis: "eyesZ", angle: -5.0}, 
+             'k': {axis: "eyesScaleZ", angle:  0.2*180/Math.PI},  // "angle" is actually the offset for the scaling
+             'K': {axis: "eyesScaleZ", angle: -0.2*180/Math.PI}
         };
 
         // create HtmlController that takes care of all interaction

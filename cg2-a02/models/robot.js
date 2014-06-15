@@ -16,19 +16,15 @@ define(["scene_node", "gl-matrix", "models/band", "models/cube", "models/paramet
     "use strict";
     
     // constructor, takes WebGL context object as argument
-    var Robot = function(gl, programs, config) {
+    var Robot = function(gl, programs) {
         
-        // read the configuration parameters
-        config = config || {};
-        // this.drawStyle = config.drawStyle || "faces";
-
         if (!programs) console.log("no programs");
         if (!programs.red) console.log("no programs.red");
         if (!programs.vertexColor) console.log("no programs.vertexColor");
         if (!programs.black) console.log("no programs.black");
 
 
-        // components for the robot
+        //-- components for the robot ------------
         var triangle = new Triangle(gl);
         var cube = new Cube(gl);
         var bandSolid  = new Band(gl, {radius: 0.5, height: 1, drawStyle: "faces"});
@@ -106,6 +102,7 @@ define(["scene_node", "gl-matrix", "models/band", "models/cube", "models/paramet
         this.wristSize = [elbowSize[0], elbowSize[1], elbowSize[2]];
         var fingerSize = [this.wristSize[1]/4, this.wristSize[0], this.wristSize[2]];
         var hatSize = [5*headSize[2], headSize[1], headSize[2]];
+        var badgeSize = [torsoSize[0]/5, torsoSize[0]/5, torsoSize[0]/5];
 
 
 
@@ -140,6 +137,38 @@ define(["scene_node", "gl-matrix", "models/band", "models/cube", "models/paramet
         this.neck.add(this.head);
 
 
+        this.finger1L = new SceneNode("finger 1 left");
+        mat4.translate(this.finger1L.transform(), [ +this.wristSize[0]/2 - fingerSize[0]/2, -fingerSize[1]/2, 0]);
+
+        this.finger2L = new SceneNode("finger 2 left");
+        mat4.translate(this.finger2L.transform(), [ -this.wristSize[0]/2 + fingerSize[0]/2, -fingerSize[1]/2, 0]);
+        
+        this.wristL = new SceneNode("wrist left");
+        mat4.translate(this.wristL.transform(), [ 0, -armLowerSize[1]/2, 0]);
+        this.wristL.add(this.finger1L);
+        this.wristL.add(this.finger2L);
+
+        this.armLowerL = new SceneNode("arm lower left");
+        mat4.translate(this.armLowerL.transform(), [ 0, -armLowerSize[1]/2, 0]);
+        this.armLowerL.add(this.wristL);
+        
+        this.elbowL = new SceneNode("elbow left");
+        mat4.translate(this.elbowL.transform(), [ 0, -armUpperSize[1]/2, 0]);
+        this.elbowL.add(this.armLowerL);
+        
+        this.armUpperL = new SceneNode("arm upper left");
+        mat4.translate(this.armUpperL.transform(), [ 0, -armUpperSize[1]/2, 0]);
+        this.armUpperL.add(this.elbowL);
+
+        this.armL = new SceneNode("arm left");
+        mat4.translate(this.armL.transform(), [ shoulderSize[0]/2, 0, 0]);
+        this.armL.add(this.armUpperL);
+
+        this.shoulderL = new SceneNode("shoulder left");
+        mat4.translate(this.shoulderL.transform(), [ torsoSize[0]/2 + shoulderSize[1]/2, 0.375*torsoSize[1], 0]);
+        this.shoulderL.add(this.armL);
+
+
         this.finger1R = new SceneNode("finger 1 right");
         mat4.translate(this.finger1R.transform(), [ -this.wristSize[0]/2 + fingerSize[0]/2, -fingerSize[1]/2, 0]);
 
@@ -150,7 +179,7 @@ define(["scene_node", "gl-matrix", "models/band", "models/cube", "models/paramet
         mat4.translate(this.wristR.transform(), [ 0, -armLowerSize[1]/2, 0]);
         this.wristR.add(this.finger1R);
         this.wristR.add(this.finger2R);
-// 
+
         this.armLowerR = new SceneNode("arm lower right");
         mat4.translate(this.armLowerR.transform(), [ 0, -armLowerSize[1]/2, 0]);
         this.armLowerR.add(this.wristR);
@@ -172,12 +201,18 @@ define(["scene_node", "gl-matrix", "models/band", "models/cube", "models/paramet
         this.shoulderR.add(this.armR);
 
 
+        this.badge = new SceneNode("badge");
+        mat4.translate(this.badge.transform(), [torsoSize[0]/4, torsoSize[1]/4, 0.525*torsoSize[2]])
+
+
+        // the super parent node                       <<------------<< << <<
         this.torso = new SceneNode("torso");
-        mat4.translate(this.torso.transform(), [ 0, -0.2*torsoSize[1], 0]);
-        // mat4.scale(this.torso.transform(), [0.5, 0.5, 0.5]); // scale the whole robot <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        // mat4.scale(this.torso.transform(), [1.2, 1.2, 1.2]); // scale the whole robot
+        mat4.translate(this.torso.transform(), [ 0, -0.2*torsoSize[1], 0]); // move the whole robot
+        // mat4.scale(this.torso.transform(), [0.5, 0.5, 0.5]);                // scale the whole robot
         this.torso.add(this.neck);
         this.torso.add(this.shoulderR);
+        this.torso.add(this.shoulderL);
+        this.torso.add(this.badge);
 
 
 
@@ -192,8 +227,8 @@ define(["scene_node", "gl-matrix", "models/band", "models/cube", "models/paramet
         mat4.scale(neckSkin.transform(), neckSize);
 
         var headSkin = new SceneNode("head skin");
-        // headSkin.add(cube, programs.vertexColor);
-        headSkin.add(ellipsoidSolid, programs.red);
+        headSkin.add(cube, programs.vertexColor);
+        // headSkin.add(ellipsoidSolid, programs.red);
         // headSkin.add(ellipsoidWiref, programs.black);
         mat4.rotate(headSkin.transform(), 0.5 * Math.PI, [0, 1, 0]);
         mat4.scale(headSkin.transform(), headSize);
@@ -259,6 +294,11 @@ define(["scene_node", "gl-matrix", "models/band", "models/cube", "models/paramet
         // mat4.rotate(hatSkin.transform(), 0.5 * Math.PI, [1, 0, 0]);
         // mat4.rotate(hatSkin.transform(), 0.5 * Math.PI, [1, 0, 0]);
 
+        var badgeSkin = new SceneNode("badge skin");
+        badgeSkin.add(triangle, programs.vertexColor);
+        mat4.scale(badgeSkin.transform(), badgeSize);
+        // mat4.scale(badgeSkin.transform(), [0.2, 0.2, 0.2]);
+
 
 
         //-- attach skins to skeleton ------------
@@ -277,7 +317,18 @@ define(["scene_node", "gl-matrix", "models/band", "models/cube", "models/paramet
         this.wristR.add(wristSkin);
         this.finger1R.add(fingerSkin);
         this.finger2R.add(fingerSkin);
+
+        this.shoulderL.add(shoulderSkin);
+        this.armL.add(armJointSkin);
+        this.armUpperL.add(armUpperSkin);
+        this.elbowL.add(armJointSkin);
+        this.armLowerL.add(armLowerSkin);
+        this.wristL.add(wristSkin);
+        this.finger1L.add(fingerSkin);
+        this.finger2L.add(fingerSkin);
+
         this.hat.add(hatSkin);
+        this.badge.add(badgeSkin);
 
     };
 
@@ -290,11 +341,11 @@ define(["scene_node", "gl-matrix", "models/band", "models/cube", "models/paramet
         this.torso.draw(gl, program, transformation);
     };
 
-    Robot.prototype.rotate = function(cmd, angle) {
+    Robot.prototype.rotate = function(rotationAxis, angle) {
 
         // delegate draw to the scene nodes
 
-        switch(cmd) {
+        switch(rotationAxis) {
             case "armUpperRX":
                 mat4.rotate(this.shoulderR.transform(), angle, [1, 0, 0]);
                 break;
@@ -304,12 +355,35 @@ define(["scene_node", "gl-matrix", "models/band", "models/cube", "models/paramet
             case "armLowerRX":
                 mat4.rotate(this.elbowR.transform(), angle, [1, 0, 0]);
                 break;
-            case "handR":
+            case "handRY":
+                mat4.rotate(this.wristR.transform(), angle, [0, 1, 0]);
+                break;
+            case "handRGrab":
                 mat4.rotate(this.finger1R.transform(),  angle, [0, 0, 1]);
                 mat4.rotate(this.finger2R.transform(), -angle, [0, 0, 1]);
                 mat4.translate(this.finger1R.transform(), [  angle*this.wristSize[0]/2, 0, 0]);
                 mat4.translate(this.finger2R.transform(), [ -angle*this.wristSize[0]/2, 0, 0]);
                 break;
+
+            case "armUpperLX":
+                mat4.rotate(this.shoulderL.transform(), angle, [1, 0, 0]);
+                break;
+            case "armUpperLZ":
+                mat4.rotate(this.armL.transform(), angle, [0, 0, 1]);
+                break;
+            case "armLowerLX":
+                mat4.rotate(this.elbowL.transform(), angle, [1, 0, 0]);
+                break;
+            case "handLY":
+                mat4.rotate(this.wristL.transform(), angle, [0, 1, 0]);
+                break;
+            case "handLGrab":
+                mat4.rotate(this.finger1L.transform(), -angle, [0, 0, 1]);
+                mat4.rotate(this.finger2L.transform(),  angle, [0, 0, 1]);
+                mat4.translate(this.finger1L.transform(), [ -angle*this.wristSize[0]/2, 0, 0]);
+                mat4.translate(this.finger2L.transform(), [  angle*this.wristSize[0]/2, 0, 0]);
+                break;
+
             case "headY":
                 mat4.rotate(this.neck.transform(), angle/2, [0, 1, 0]);
                 mat4.rotate(this.head.transform(), angle/2, [0, 1, 0]);
@@ -318,8 +392,14 @@ define(["scene_node", "gl-matrix", "models/band", "models/cube", "models/paramet
                 mat4.rotate(this.eyeOuterR.transform(),  angle, [0, 0, 1]);
                 mat4.rotate(this.eyeOuterL.transform(), -angle, [0, 0, 1]);
                 break;
+            case "eyesScaleZ":
+                var s0 = 1 + angle/4;
+                var s1 = 1 + angle;
+                mat4.scale(this.eyeInnerR.transform(), [s0, s0, s1]);
+                mat4.scale(this.eyeInnerL.transform(), [s0, s0, s1]);
+                break;
             default:
-                console.log("rotation " + cmd + " not implemented.");
+                console.log("rotation " + rotationAxis + " not implemented.");
                 break;
         };
     };
