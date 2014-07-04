@@ -149,9 +149,8 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
 
         // show/hide certain parts of the scene            
         this.surfaceNode.setVisible( this.drawOptions["Show Surface"] ); 
-        this.wireframeNode.setVisible( this.drawOptions["Show Grid"] ); 
-        // this.debugNode.setVisible( this.drawOptions["Debug"] );
-        this.materials.planet.setUniform( "debug", "bool", this.drawOptions["Debug"] ); // <<<<<<<<<<<<<<<<<<<
+        this.wireframeNode.setVisible( this.drawOptions["Show Grid"] );
+        this.materials.planet.setUniform( "debug", "bool", this.drawOptions["Debug"] );
 
         // draw the scene 
         this.universeNode.draw(gl, null, modelViewMatrix);

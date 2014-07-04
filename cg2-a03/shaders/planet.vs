@@ -18,6 +18,7 @@ precision mediump float;
 
 attribute vec3 vertexPosition;
 attribute vec3 vertexNormal;
+attribute vec2 vertexTexCoords;
 
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
@@ -25,6 +26,7 @@ uniform mat3 normalMatrix;
 
 varying vec4 ecPosition;
 varying vec3 ecNormal;
+varying vec2 texCoords;
 
 void main() {
     
@@ -36,6 +38,6 @@ void main() {
     // set the fragment position in clip coordinates
     gl_Position  = projectionMatrix * ecPosition;
 
-    
+    texCoords = vertexTexCoords;
 }
 

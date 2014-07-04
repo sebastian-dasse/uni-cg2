@@ -41,6 +41,7 @@ define(["vbo"],
         // generate vertex coordinates and store in an array
         var coords = [];
         var normals = [];
+        var texcoords = [];
         var uDelta = (uMax - uMin) / uSegments;
         var vDelta = (vMax - vMin) / vSegments;
         for(var i = 0; i <= uSegments; i++) {
@@ -53,6 +54,12 @@ define(["vbo"],
 
                 var n = vec3.normalize(pos);
                 normals.push(n[0], n[1], n[2]);
+
+                // TODO
+                texcoords.push(u, v);
+
+                // TODO
+                // colors.push();
             }
         }
         
@@ -62,10 +69,22 @@ define(["vbo"],
                                                     "data": coords 
                                                   } );
         
-        // create vertex buffer object (VBO) for the normals
+        // // create vertex buffer object (VBO) for the colors
+        // this.colorBuffer = new vbo.Attribute(gl, { "numComponents": 4,
+        //                                             "dataType": gl.FLOAT,
+        //                                             "data": colors 
+        //                                           } );
+
+        // create vertex buffer object (VBO) for the normal vectors
         this.normalBuffer = new vbo.Attribute(gl, { "numComponents": 3,
                                                     "dataType": gl.FLOAT,
                                                     "data": normals 
+                                                  } );
+
+        // create vertex buffer object (VBO) for the texture coordinates
+        this.texcoordsBuffer = new vbo.Attribute(gl, { "numComponents": 2,
+                                                    "dataType": gl.FLOAT,
+                                                    "data": texcoords 
                                                   } );
 
         var triangles = [];
@@ -113,8 +132,8 @@ define(["vbo"],
         this.coordsBuffer.bind(gl, program, "vertexPosition");
         // this.colorBuffer.bind(gl, program, "vertexColor");
         this.normalBuffer.bind(gl, program, "vertexNormal");
-        // this.texcoordsBuffer.bind(gl, program, "vertexTexCoords");
- 
+        this.texcoordsBuffer.bind(gl, program, "vertexTexCoords");
+
         // draw the vertices as specified in the drawStyle
         switch (this.drawStyle) {
         case "points":

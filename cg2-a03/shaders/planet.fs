@@ -77,6 +77,12 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
             return vec3(0, 1.0, 0);
     }
 
+    // in debug draw striped texture
+    if (debug && mod(texCoords[1], 0.25) >= 0.125) {
+        ambient *= 2.0;
+        //diffuse *= 20.0; // TODO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< sinnvoll? -> UE-Blatt S. 3
+    }
+
     if(ndotl<=0.0) 
         return ambient; // shadow / facing away from the light source
 
