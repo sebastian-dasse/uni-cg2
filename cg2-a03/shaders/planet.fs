@@ -73,21 +73,22 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     float ndotl = dot(n,-l);
 
     // in debug mode draw a green line seperating day and night with a width of 3 degrees
-    if (debug && radians(87.0) <= acos(abs(ndotl))) {
+    if (debug && radians(88.5) <= acos(abs(ndotl))) {
             return vec3(0, 1.0, 0);
     }
 
     // in debug draw striped texture
-    if (debug && mod(texCoords[1], 0.25) >= 0.125) {
-        ambient *= 2.0;
-        //diffuse *= 20.0; // TODO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< sinnvoll? -> UE-Blatt S. 3
+    float debugfactor = 1.0;
+    if (debug && mod(texCoords[1], 0.125) >= 0.0625) {
+        debugfactor = 1.25;
+        ambient *= debugfactor;
     }
 
     if(ndotl<=0.0) 
         return ambient; // shadow / facing away from the light source
 
     // diffuse contribution
-    vec3 diffuse = material.diffuse * light.color * ndotl;
+    vec3 diffuse = debugfactor * material.diffuse * light.color * ndotl;
     
      // reflected light direction = perfect reflection direction
     vec3 r = reflect(l,n);

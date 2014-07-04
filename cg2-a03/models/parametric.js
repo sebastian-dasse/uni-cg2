@@ -56,7 +56,10 @@ define(["vbo"],
                 normals.push(n[0], n[1], n[2]);
 
                 // TODO
-                texcoords.push(u, v);
+                // texcoords.push(u, v);
+                var texX =     (u - uMin) / (uMax - uMin);
+                var texY = 1 - (v - vMin) / (vMax - vMin);
+                texcoords.push(texX, texY);
 
                 // TODO
                 // colors.push();
