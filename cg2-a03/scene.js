@@ -49,7 +49,18 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         this.materials.planet.setUniform( "light.type", "int", 0 );
         this.materials.planet.setUniform( "light.direction", "vec3", [-1,0,0] );
         
+        //---------
         // TODO load and create required textures
+        // this.tex0 = new texture.Texture2D(gl, "textures/earth_month04.jpg");
+        // // texture.Texture2D(gl, "", false, {});
+
+        // var _scene = this;
+        // texture.onAllTexturesLoaded( function() {
+        //     _scene.programs.planet.use();
+        //     _scene.programs.planet.setTexture("texture0", 0, this.tex0);
+        //     _scene.draw();
+        // });
+        //---------
 
         // initial position of the camera
         this.cameraTransformation = mat4.lookAt([0,0,3], [0,0,0], [0,1,0]);

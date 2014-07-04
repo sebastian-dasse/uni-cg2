@@ -47,6 +47,9 @@ uniform LightSource light;
 // flag for debug mode
 uniform bool debug;
 
+// texture for the planet surface
+uniform sampler2D texture0;
+
 /*
 
  Calculate surface color based on Phong illumination model.
@@ -89,6 +92,10 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
 
     // diffuse contribution
     vec3 diffuse = debugfactor * material.diffuse * light.color * ndotl;
+    //---------
+    //vec3 color1 = texture2D(texture0, texCoords).rgb;
+    //vec3 diffuse = debugfactor * color1 * light.color * ndotl;
+    //---------
     
      // reflected light direction = perfect reflection direction
     vec3 r = reflect(l,n);

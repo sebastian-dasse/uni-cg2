@@ -42,8 +42,10 @@ define(["vbo"],
         var coords = [];
         var normals = [];
         var texcoords = [];
-        var uDelta = (uMax - uMin) / uSegments;
-        var vDelta = (vMax - vMin) / vSegments;
+        var uRange = uMax - uMin;
+        var vRange = vMax - vMin;
+        var uDelta = uRange / uSegments;
+        var vDelta = vRange / vSegments;
         for(var i = 0; i <= uSegments; i++) {
             var u = uMin + i * uDelta;
             for(var j = 0; j <= vSegments; j++) {
@@ -55,11 +57,9 @@ define(["vbo"],
                 var n = vec3.normalize(pos);
                 normals.push(n[0], n[1], n[2]);
 
-                // TODO
-                // texcoords.push(u, v);
-                var texX =     (u - uMin) / (uMax - uMin);
-                var texY = 1 - (v - vMin) / (vMax - vMin);
-                texcoords.push(texX, texY);
+                var s =  (u - uMin) / uRange;
+                var t = -(v - vMin) / vRange;
+                texcoords.push(s, t);
 
                 // TODO
                 // colors.push();
