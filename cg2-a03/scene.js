@@ -53,6 +53,7 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         //---------
         // TODO load and create required textures
         var tex0 = new texture.Texture2D(gl, "textures/earth_month04.jpg", false, console.log("tex0 loaded"));
+        var tex1 = new texture.Texture2D(gl, "textures/earth_at_night_2048.jpg", false, console.log("tex1 loaded"));
         // // texture.Texture2D(gl, "", false, {});
         // // texture.Texture2D(webglcontext, imagepath, usemipmap, ontextureloadedcallback);
 
@@ -60,6 +61,7 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         texture.onAllTexturesLoaded( function() {
             _scene.programs.planet.use();
             _scene.programs.planet.setTexture("dayTex", 0, tex0);
+            _scene.programs.planet.setTexture("nightTex", 1, tex1);
             // _scene.programs.planet.setTexture("texture0", 0, this.tex0);
             _scene.draw();
             console.log("all textures loaded")
@@ -139,9 +141,9 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         this.drawOptions = { 
                              "Show Surface": true,
                              "Show Grid": false,
-                             "Debug": true,
+                             "Debug": false,
                              "Daytime Texture": true,
-                             "Night Lights": false,
+                             "Night Lights": true,
                              };                       
     };
 
@@ -181,7 +183,7 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         this.wireframeNode.setVisible( this.drawOptions["Show Grid"] );
         this.materials.planet.setUniform( "debugOn", "bool", this.drawOptions["Debug"] );
         this.materials.planet.setUniform( "dayTexOn", "bool", this.drawOptions["Daytime Texture"] );
-        this.materials.planet.setUniform( "debug", "bool", this.drawOptions["Night Lights"] );
+        this.materials.planet.setUniform( "nightTexOn", "bool", this.drawOptions["Night Lights"] );
 
         // draw the scene 
         this.universeNode.draw(gl, null, modelViewMatrix);

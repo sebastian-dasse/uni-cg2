@@ -49,11 +49,15 @@ uniform bool debugOn;
 
 // flag for daytime mode
 uniform bool dayTexOn;
+uniform bool nightTexOn;
 
 const float numDebugStripes = 24.0;
+const float debugfactor = 1.5;
+const float nightfactor = 0.7;
 
-// texture for the planet surface
+// textures for the planet surface
 uniform sampler2D dayTex;
+uniform sampler2D nightTex;
 
 /*
 
@@ -69,7 +73,7 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
 
     // ambient part
     vec3 ambient = material.ambient * ambientLight;
-    
+
     // back face towards viewer (looking at the earth from the inside)?
     float ndotv = dot(n,v);
     if(ndotv<0.0)
@@ -87,25 +91,32 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     }
 
     // in debug draw striped texture
-    float debugfactor = 1.0;
     if (debugOn && mod(texCoords[0], 2.0/numDebugStripes) >= 1.0/numDebugStripes) {
-        debugfactor = 1.25;
         ambient *= debugfactor;
     }
 
-    if(ndotl<=0.0) 
-        return ambient; // shadow / facing away from the light source
+    // shadow / facing away from the light source
+    if (ndotl <= 0.0) {
+        if (nightTexOn) {
+            ambient += nightfactor * texture2D(nightTex, texCoords).rgb;
+        }
+        return ambient;
+    }
 
     // diffuse contribution
     //vec3 diffuse = debugfactor * material.diffuse * light.color * ndotl;
 
     //---------
     vec3 diffuse = light.color * ndotl;
+    
+    if (debugOn) {
+        diffuse *= debugfactor;
+    }
     if (dayTexOn) {
         vec3 color1 = texture2D(dayTex, texCoords).rgb;
-        diffuse = debugfactor * color1 * diffuse;
+        diffuse *= color1;
     } else {
-        diffuse = debugfactor * material.diffuse * diffuse;
+        diffuse *= material.diffuse;
     }
     //---------
     
