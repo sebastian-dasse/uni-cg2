@@ -57,14 +57,16 @@ define(["vbo"],
                 var n = vec3.normalize(pos);
                 normals.push(n[0], n[1], n[2]);
 
-                var s =  (u - uMin) / uRange;
-                var t = -(v - vMin) / vRange;
+                var s = 1 - (u + uMax) / uRange;
+                var t = 1 - (v + vMax) / vRange;
                 texcoords.push(s, t);
 
                 // TODO
                 // colors.push();
             }
         }
+        console.log(coords.length);
+        console.log(texcoords.length);
         
         // create vertex buffer object (VBO) for the coordinates
         this.coordsBuffer = new vbo.Attribute(gl, { "numComponents": 3,

@@ -87,6 +87,18 @@ define(["jquery", "gl-matrix", "webgl-debug", "animation", "scene", "scene_explo
         // of HTML elements with the scene and the animation
         var controller = new HtmlController(scene,animation); 
 
+        //-- DEBUGGING --------------------------------------------------------<< << <<
+        // var keyMap {
+        //      'x': {axis: "worldX", angle:  2.0}, 
+        //      'X': {axis: "worldX", angle: -2.0}, 
+        //      'y': {axis: "worldY", angle:  2.0}, 
+        //      'Y': {axis: "worldY", angle: -2.0},
+        //      's': {axis: "sunLight", angle: 2.0},
+        //      'S': {axis: "sunLight", angle: -2.0}
+        // };
+        // var controller = new HtmlController(scene,animation, keyMap); 
+        //-- DEBUGGING --------------------------------------------------------<< << <<
+
         // create scene explorer handling all events for the canvas
         var explorer = new SceneExplorer(gl.canvas, true, scene);
         

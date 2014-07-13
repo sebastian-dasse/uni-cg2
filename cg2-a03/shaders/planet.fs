@@ -48,7 +48,7 @@ uniform LightSource light;
 uniform bool debug;
 
 // texture for the planet surface
-uniform sampler2D texture0;
+uniform sampler2D dayTex;
 
 /*
 
@@ -61,6 +61,8 @@ uniform sampler2D texture0;
  */
 vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) {
     
+    return texture2D(dayTex, texCoords).rgb; // <<<<<<<<<<<<<DEBUGGING
+
     // ambient part
     vec3 ambient = material.ambient * ambientLight;
     
@@ -91,10 +93,11 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
         return ambient; // shadow / facing away from the light source
 
     // diffuse contribution
-    vec3 diffuse = debugfactor * material.diffuse * light.color * ndotl;
+    //vec3 diffuse = debugfactor * material.diffuse * light.color * ndotl;
+
     //---------
-    //vec3 color1 = texture2D(texture0, texCoords).rgb;
-    //vec3 diffuse = debugfactor * color1 * light.color * ndotl;
+    vec3 color1 = texture2D(dayTex, texCoords).rgb;
+    vec3 diffuse = debugfactor * color1 * light.color * ndotl;
     //---------
     
      // reflected light direction = perfect reflection direction

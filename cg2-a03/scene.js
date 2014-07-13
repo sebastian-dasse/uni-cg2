@@ -37,10 +37,11 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         // set uniforms required by the respective shaders
         this.materials.blue.setUniform( "uniColor", "vec4", [0.1, 0.1, 0.8, 1] );
         this.materials.grid.setUniform( "uniColor", "vec4", [0.7, 0.7, 0.7, 1] );
-        this.materials.planet.setUniform( "material.ambient",   "vec3", [0.6,0.2,0.2] ); 
+        // this.materials.planet.setUniform( "material.ambient",   "vec3", [0.6,0.2,0.2] ); // nice for red sphere
+        this.materials.planet.setUniform( "material.ambient",   "vec3", [0.2,0.2,0.2] ); // better for the earth
+        this.materials.planet.setUniform( "material.ambient",   "vec3", [0.5,0.5,0.5] ); // <<<<<<<<<<<<<<<<<<<<DEBUGGING
         this.materials.planet.setUniform( "material.diffuse",   "vec3", [0.8,0.2,0.2] ); 
         this.materials.planet.setUniform( "material.specular",  "vec3", [0.4,0.4,0.4] ); 
-        this.materials.planet.setUniform( "material.shininess", "float", 80 ); 
         this.materials.planet.setUniform( "material.shininess", "float", 80 ); 
 
         // set light properties for shader
@@ -51,15 +52,19 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         
         //---------
         // TODO load and create required textures
-        // this.tex0 = new texture.Texture2D(gl, "textures/earth_month04.jpg");
+        var tex0 = new texture.Texture2D(gl, "textures/test.jpg", false, console.log("tex0 loaded"));
+        // var tex0 = new texture.Texture2D(gl, "textures/earth_month04.jpg", false, console.log("tex0 loaded"));
         // // texture.Texture2D(gl, "", false, {});
+        // // texture.Texture2D(webglcontext, imagepath, usemipmap, ontextureloadedcallback);
 
-        // var _scene = this;
-        // texture.onAllTexturesLoaded( function() {
-        //     _scene.programs.planet.use();
-        //     _scene.programs.planet.setTexture("texture0", 0, this.tex0);
-        //     _scene.draw();
-        // });
+        var _scene = this;
+        texture.onAllTexturesLoaded( function() {
+            _scene.programs.planet.use();
+            _scene.programs.planet.setTexture("dayTex", 0, tex0);
+            // _scene.programs.planet.setTexture("texture0", 0, this.tex0);
+            _scene.draw();
+            console.log("all textures loaded")
+        });
         //---------
 
         // initial position of the camera
@@ -78,10 +83,10 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         // planet surface
         // this.planetSurface = new Cube(gl);
         var positionFunc = function(u, v) {
-            var r = 1.0;
-            return [ r * Math.sin(u) * Math.cos(v), 
-                     r * Math.sin(u) * Math.sin(v), 
-                     r * Math.cos(u) ];
+            var r = 0.9;
+            return [ r * Math.cos(u) * Math.cos(v), 
+                     r * Math.sin(u) * Math.cos(v), 
+                     r * Math.sin(v) ];
         };
         var config = {
             "uMin": -Math.PI, 
@@ -92,6 +97,17 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
             "vSegments": 40//, 
             // "drawStyle": "faces", 
         };
+
+        //-- just for debugging: use a simple grid --
+        // config.uSegments = 8;
+        // config.vSegments = 4;
+        // var positionFunc = function(u,v) {
+        //     return [ 0.3 * u,
+        //              0.3 * v,
+        //              0.5 ];
+        // }; // grid
+        //----
+        
         this.planetSurface = new ParametricSurface(gl, positionFunc, config);
         this.surfaceNode = new SceneNode("Surface");
         this.surfaceNode.add(this.planetSurface, this.materials.planet);
@@ -110,7 +126,7 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         // mat4.rotate(this.planetNode.transform(), Math.PI/4, [0,1,0]);
 
         // rotate sphere so that the poles lie on the y-axis
-        mat4.rotate(this.planetNode.transform(), Math.PI/2, [1, 0, 0]);
+        mat4.rotate(this.planetNode.transform(), Math.PI/2, [1, 0, 0]); // <<<<<<<<<<<<<<<<<<<< commented out for DEBUGGING
 
         // our universe: planet + sunlight
         this.universeNode = new SceneNode("Universe");
@@ -123,7 +139,8 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         this.drawOptions = { 
                              "Show Surface": true,
                              "Show Grid": false,
-                             "Debug": true,
+                             "Debug": false,
+                             "Daytime Texture": true,
                              };                       
     };
 
@@ -190,7 +207,7 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
                 break;
             default:
                 window.console.log("axis " + rotationAxis + " not implemented.");
-            break;
+                break;
         };
 
         // redraw the scene
