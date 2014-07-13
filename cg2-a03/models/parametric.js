@@ -65,8 +65,6 @@ define(["vbo"],
                 // colors.push();
             }
         }
-        console.log(coords.length);
-        console.log(texcoords.length);
         
         // create vertex buffer object (VBO) for the coordinates
         this.coordsBuffer = new vbo.Attribute(gl, { "numComponents": 3,

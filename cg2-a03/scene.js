@@ -39,7 +39,7 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         this.materials.grid.setUniform( "uniColor", "vec4", [0.7, 0.7, 0.7, 1] );
         // this.materials.planet.setUniform( "material.ambient",   "vec3", [0.6,0.2,0.2] ); // nice for red sphere
         this.materials.planet.setUniform( "material.ambient",   "vec3", [0.2,0.2,0.2] ); // better for the earth
-        this.materials.planet.setUniform( "material.ambient",   "vec3", [0.5,0.5,0.5] ); // <<<<<<<<<<<<<<<<<<<<DEBUGGING
+        // this.materials.planet.setUniform( "material.ambient",   "vec3", [0.5,0.5,0.5] ); // <<<<<<<<<<<<<<<<<<<<DEBUGGING
         this.materials.planet.setUniform( "material.diffuse",   "vec3", [0.8,0.2,0.2] ); 
         this.materials.planet.setUniform( "material.specular",  "vec3", [0.4,0.4,0.4] ); 
         this.materials.planet.setUniform( "material.shininess", "float", 80 ); 
@@ -52,8 +52,7 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         
         //---------
         // TODO load and create required textures
-        var tex0 = new texture.Texture2D(gl, "textures/test.jpg", false, console.log("tex0 loaded"));
-        // var tex0 = new texture.Texture2D(gl, "textures/earth_month04.jpg", false, console.log("tex0 loaded"));
+        var tex0 = new texture.Texture2D(gl, "textures/earth_month04.jpg", false, console.log("tex0 loaded"));
         // // texture.Texture2D(gl, "", false, {});
         // // texture.Texture2D(webglcontext, imagepath, usemipmap, ontextureloadedcallback);
 
@@ -83,7 +82,7 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         // planet surface
         // this.planetSurface = new Cube(gl);
         var positionFunc = function(u, v) {
-            var r = 0.9;
+            var r = 1.0;
             return [ r * Math.cos(u) * Math.cos(v), 
                      r * Math.sin(u) * Math.cos(v), 
                      r * Math.sin(v) ];
@@ -93,23 +92,24 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
             "uMax":  Math.PI, 
             "vMin": -Math.PI/2.0, 
             "vMax":  Math.PI/2.0, 
-            "uSegments": 80, 
-            "vSegments": 40//, 
+            "uSegments": 60, 
+            "vSegments": 30//, 
             // "drawStyle": "faces", 
         };
 
-        //-- just for debugging: use a simple grid --
-        // config.uSegments = 8;
-        // config.vSegments = 4;
+        //-- for debugging: use a simple grid --
+        // config.uSegments = 12;
+        // config.vSegments =  6;
         // var positionFunc = function(u,v) {
         //     return [ 0.3 * u,
         //              0.3 * v,
         //              0.5 ];
         // }; // grid
         //----
-        
+
         this.planetSurface = new ParametricSurface(gl, positionFunc, config);
         this.surfaceNode = new SceneNode("Surface");
+        // this.surfaceNode.add(this.planetSurface, this.materials.blue); // for debugging: a blue sphere
         this.surfaceNode.add(this.planetSurface, this.materials.planet);
 
         config.drawStyle = "lines";
@@ -126,7 +126,7 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         // mat4.rotate(this.planetNode.transform(), Math.PI/4, [0,1,0]);
 
         // rotate sphere so that the poles lie on the y-axis
-        mat4.rotate(this.planetNode.transform(), Math.PI/2, [1, 0, 0]); // <<<<<<<<<<<<<<<<<<<< commented out for DEBUGGING
+        mat4.rotate(this.planetNode.transform(), Math.PI/2, [1, 0, 0]); // comment out for the debugging grid
 
         // our universe: planet + sunlight
         this.universeNode = new SceneNode("Universe");
@@ -139,8 +139,9 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         this.drawOptions = { 
                              "Show Surface": true,
                              "Show Grid": false,
-                             "Debug": false,
+                             "Debug": true,
                              "Daytime Texture": true,
+                             "Night Lights": false,
                              };                       
     };
 
@@ -178,7 +179,9 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         // show/hide certain parts of the scene            
         this.surfaceNode.setVisible( this.drawOptions["Show Surface"] ); 
         this.wireframeNode.setVisible( this.drawOptions["Show Grid"] );
-        this.materials.planet.setUniform( "debug", "bool", this.drawOptions["Debug"] );
+        this.materials.planet.setUniform( "debugOn", "bool", this.drawOptions["Debug"] );
+        this.materials.planet.setUniform( "dayTexOn", "bool", this.drawOptions["Daytime Texture"] );
+        this.materials.planet.setUniform( "debug", "bool", this.drawOptions["Night Lights"] );
 
         // draw the scene 
         this.universeNode.draw(gl, null, modelViewMatrix);

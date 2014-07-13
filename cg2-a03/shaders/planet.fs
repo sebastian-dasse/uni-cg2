@@ -45,7 +45,12 @@ struct LightSource {
 uniform LightSource light;
 
 // flag for debug mode
-uniform bool debug;
+uniform bool debugOn;
+
+// flag for daytime mode
+uniform bool dayTexOn;
+
+const float numDebugStripes = 24.0;
 
 // texture for the planet surface
 uniform sampler2D dayTex;
@@ -60,8 +65,7 @@ uniform sampler2D dayTex;
  
  */
 vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) {
-    
-    return texture2D(dayTex, texCoords).rgb; // <<<<<<<<<<<<<DEBUGGING
+    //return texture2D(dayTex, texCoords).rgb; // <<<<<<<<<<<<<DEBUGGING
 
     // ambient part
     vec3 ambient = material.ambient * ambientLight;
@@ -78,13 +82,13 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     float ndotl = dot(n,-l);
 
     // in debug mode draw a green line seperating day and night with a width of 3 degrees
-    if (debug && radians(88.5) <= acos(abs(ndotl))) {
+    if (debugOn && radians(88.5) <= acos(abs(ndotl))) {
             return vec3(0, 1.0, 0);
     }
 
     // in debug draw striped texture
     float debugfactor = 1.0;
-    if (debug && mod(texCoords[1], 0.125) >= 0.0625) {
+    if (debugOn && mod(texCoords[0], 2.0/numDebugStripes) >= 1.0/numDebugStripes) {
         debugfactor = 1.25;
         ambient *= debugfactor;
     }
@@ -96,10 +100,19 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     //vec3 diffuse = debugfactor * material.diffuse * light.color * ndotl;
 
     //---------
-    vec3 color1 = texture2D(dayTex, texCoords).rgb;
-    vec3 diffuse = debugfactor * color1 * light.color * ndotl;
+    vec3 diffuse = light.color * ndotl;
+    if (dayTexOn) {
+        vec3 color1 = texture2D(dayTex, texCoords).rgb;
+        diffuse = debugfactor * color1 * diffuse;
+    } else {
+        diffuse = debugfactor * material.diffuse * diffuse;
+    }
     //---------
     
+
+
+
+
      // reflected light direction = perfect reflection direction
     vec3 r = reflect(l,n);
     
