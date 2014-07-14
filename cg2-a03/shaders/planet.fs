@@ -50,10 +50,15 @@ uniform bool debugOn;
 // flag for daytime mode
 uniform bool dayTexOn;
 uniform bool nightTexOn;
+uniform bool everlastingDayOn;
+uniform bool everlastingNightOn;
 
+const float epsilon = 0.1;
 const float numDebugStripes = 24.0;
-const float debugfactor = 1.5;
-const float nightfactor = 0.7;
+const float debugFactor = 2.0;
+const float dayFactor = 1.1;
+const float nightFactor = 0.7;
+const float duskAngle = 15.0;
 
 // textures for the planet surface
 uniform sampler2D dayTex;
@@ -69,15 +74,20 @@ uniform sampler2D nightTex;
  
  */
 vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) {
-    //return texture2D(dayTex, texCoords).rgb; // <<<<<<<<<<<<<DEBUGGING
+    if (everlastingDayOn) {
+        return texture2D(dayTex, texCoords).rgb;
+    }
+    if (everlastingNightOn) {
+        return texture2D(nightTex, texCoords).rgb;
+    }
 
     // ambient part
     vec3 ambient = material.ambient * ambientLight;
 
     // back face towards viewer (looking at the earth from the inside)?
     float ndotv = dot(n,v);
-    if(ndotv<0.0)
-        return vec3(1,0,0);
+    if (ndotv < 0.0 - epsilon)
+        return vec3(1, 0, 0);
     
     // vector from light to current point
     vec3 l = normalize(light.direction);
@@ -87,44 +97,38 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
 
     // in debug mode draw a green line seperating day and night with a width of 3 degrees
     if (debugOn && radians(88.5) <= acos(abs(ndotl))) {
-            return vec3(0, 1.0, 0);
+        return vec3(0.0, 1.0, 0.0);
     }
 
     // in debug draw striped texture
     if (debugOn && mod(texCoords[0], 2.0/numDebugStripes) >= 1.0/numDebugStripes) {
-        ambient *= debugfactor;
+        ambient *= debugFactor;
     }
 
-    // shadow / facing away from the light source
-    if (ndotl <= 0.0) {
-        if (nightTexOn) {
-            ambient += nightfactor * texture2D(nightTex, texCoords).rgb;
-        }
-        return ambient;
+    vec3 nightColor = vec3(0.0, 0.0, 0.0);
+    if (nightTexOn) {
+        nightColor = nightFactor * texture2D(nightTex, texCoords).rgb;
+    }
+    if (ndotl <= 0.0) { // shadow / facing away from the light source
+        return ambient + nightColor;
     }
 
-    // diffuse contribution
-    //vec3 diffuse = debugfactor * material.diffuse * light.color * ndotl;
-
-    //---------
-    vec3 diffuse = light.color * ndotl;
-    
-    if (debugOn) {
-        diffuse *= debugfactor;
-    }
+    vec3 diffuse = light.color * ndotl; // diffuse contribution
     if (dayTexOn) {
-        vec3 color1 = texture2D(dayTex, texCoords).rgb;
-        diffuse *= color1;
+        diffuse *= dayFactor * texture2D(dayTex, texCoords).rgb;
     } else {
         diffuse *= material.diffuse;
     }
-    //---------
     
+    if (nightTexOn) { // dusk
+        float angle = 90.0 - degrees(acos(ndotl));
+        if (angle < duskAngle) {
+            float f = angle / duskAngle;
+            return ambient + nightColor * (1.0 - f) + diffuse * f;
+        }
+    }
 
-
-
-
-     // reflected light direction = perfect reflection direction
+    // reflected light direction = perfect reflection direction
     vec3 r = reflect(l,n);
     
     // angle between reflection dir and viewing dir
