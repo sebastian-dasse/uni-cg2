@@ -52,12 +52,16 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         // load and create required textures
         var tex0 = new texture.Texture2D(gl, "textures/earth_month04.jpg", false, console.log("tex0 loaded"));
         var tex1 = new texture.Texture2D(gl, "textures/earth_at_night_2048.jpg", false, console.log("tex1 loaded"));
+        var tex2 = new texture.Texture2D(gl, "textures/earth_bathymetry_2048.jpg", false, console.log("tex2 loaded"));
+        var tex3 = new texture.Texture2D(gl, "textures/earth_topography_2048.jpg", false, console.log("tex3 loaded"));
 
         var _scene = this;
         texture.onAllTexturesLoaded( function() {
             _scene.programs.planet.use();
             _scene.programs.planet.setTexture("dayTex", 0, tex0);
             _scene.programs.planet.setTexture("nightTex", 1, tex1);
+            _scene.programs.planet.setTexture("baryTex", 2, tex2);
+            _scene.programs.planet.setTexture("topoTex", 3, tex3);
             _scene.draw();
             console.log("all textures loaded")
         });
@@ -140,7 +144,9 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
                              "Night Lights": true, 
                              "Everlasting Day": false, 
                              "Everlasting Night": false, 
-                             };                       
+                             "Red-Green": false, 
+                             "Gloss Map": true, 
+                             };
     };
 
     // the scene's draw method draws whatever the scene wants to draw
@@ -182,6 +188,8 @@ define(["gl-matrix", "program", "scene_node", "shaders", "directional_light", "m
         this.materials.planet.setUniform( "nightTexOn", "bool", this.drawOptions["Night Lights"] );
         this.materials.planet.setUniform( "everlastingDayOn", "bool", this.drawOptions["Everlasting Day"] );
         this.materials.planet.setUniform( "everlastingNightOn", "bool", this.drawOptions["Everlasting Night"] );
+        this.materials.planet.setUniform( "redGreenOn", "bool", this.drawOptions["Red-Green"] );
+        this.materials.planet.setUniform( "glossMapOn", "bool", this.drawOptions["Gloss Map"] );
 
         // draw the scene 
         this.universeNode.draw(gl, null, modelViewMatrix);

@@ -52,6 +52,8 @@ uniform bool dayTexOn;
 uniform bool nightTexOn;
 uniform bool everlastingDayOn;
 uniform bool everlastingNightOn;
+uniform bool redGreenOn;
+uniform bool glossMapOn;
 
 const float epsilon = 0.1;
 const float numDebugStripes = 24.0;
@@ -63,6 +65,8 @@ const float duskAngle = 15.0;
 // textures for the planet surface
 uniform sampler2D dayTex;
 uniform sampler2D nightTex;
+uniform sampler2D baryTex;
+uniform sampler2D topoTex;
 
 /*
 
@@ -74,6 +78,22 @@ uniform sampler2D nightTex;
  
  */
 vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) {
+    
+    float baryVal = texture2D(baryTex, texCoords).r;
+    if (redGreenOn) {
+        if (baryVal >= epsilon) { // water
+            return vec3(baryVal, 0.0, 0.0);
+        } else { // earth
+            float topoVal = texture2D(topoTex, texCoords).r;
+            return vec3(0.0, topoVal, 0.0);
+        }
+    }
+
+    if (glossMapOn && baryVal < epsilon) {
+        material.shininess /= 10.0;
+        material.specular /= 5.0;
+    }
+
     if (everlastingDayOn) {
         return texture2D(dayTex, texCoords).rgb;
     }
@@ -124,7 +144,7 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
         float angle = 90.0 - degrees(acos(ndotl));
         if (angle < duskAngle) {
             float f = angle / duskAngle;
-            diffuse = nightColor * (1.0 - f) + diffuse * f; // FALSCH: das ist nur "diffuse", kein return hier!!!!
+            diffuse = nightColor * (1.0 - f) + diffuse * f;
         }
     }
 
