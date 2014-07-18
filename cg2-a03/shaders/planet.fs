@@ -56,8 +56,8 @@ uniform bool everlastingNightOn;
 const float epsilon = 0.1;
 const float numDebugStripes = 24.0;
 const float debugFactor = 2.0;
-const float dayFactor = 1.1;
-const float nightFactor = 0.7;
+const float dayFactor = 1.4;
+const float nightFactor = 0.9;
 const float duskAngle = 15.0;
 
 // textures for the planet surface
@@ -124,7 +124,7 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
         float angle = 90.0 - degrees(acos(ndotl));
         if (angle < duskAngle) {
             float f = angle / duskAngle;
-            return ambient + nightColor * (1.0 - f) + diffuse * f;
+            diffuse = nightColor * (1.0 - f) + diffuse * f; // FALSCH: das ist nur "diffuse", kein return hier!!!!
         }
     }
 
