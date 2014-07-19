@@ -54,6 +54,7 @@ uniform bool everlastingDayOn;
 uniform bool everlastingNightOn;
 uniform bool redGreenOn;
 uniform bool glossMapOn;
+uniform bool cloudsOn;
 
 const float epsilon = 0.1;
 const float numDebugStripes = 24.0;
@@ -67,6 +68,7 @@ uniform sampler2D dayTex;
 uniform sampler2D nightTex;
 uniform sampler2D baryTex;
 uniform sampler2D topoTex;
+uniform sampler2D cloudsTex;
 
 /*
 
@@ -78,27 +80,21 @@ uniform sampler2D topoTex;
  
  */
 vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) {
-    
-    float baryVal = texture2D(baryTex, texCoords).r;
-    if (redGreenOn) {
-        if (baryVal >= epsilon) { // water
-            return vec3(baryVal, 0.0, 0.0);
-        } else { // earth
-            float topoVal = texture2D(topoTex, texCoords).r;
-            return vec3(0.0, topoVal, 0.0);
-        }
-    }
-
-    if (glossMapOn && baryVal < epsilon) {
-        material.shininess /= 10.0;
-        material.specular /= 5.0;
-    }
-
     if (everlastingDayOn) {
         return texture2D(dayTex, texCoords).rgb;
     }
     if (everlastingNightOn) {
         return texture2D(nightTex, texCoords).rgb;
+    }    
+    if (redGreenOn || glossMapOn) {
+        float baryVal = texture2D(baryTex, texCoords).r;
+        if (redGreenOn) {
+            return (baryVal >= epsilon) ? vec3(baryVal, 0.0, 0.0) : vec3(0.0, texture2D(topoTex, texCoords).r, 0.0);
+        }
+        if (baryVal < epsilon) {
+            material.shininess /= 10.0;
+            material.specular /= 5.0;
+        }
     }
 
     // ambient part
@@ -125,22 +121,23 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
         ambient *= debugFactor;
     }
 
-    vec3 nightColor = vec3(0.0, 0.0, 0.0);
-    if (nightTexOn) {
-        nightColor = nightFactor * texture2D(nightTex, texCoords).rgb;
-    }
-    if (ndotl <= 0.0) { // shadow / facing away from the light source
+    float cloudsVal = cloudsOn ? texture2D(cloudsTex, texCoords).r : 0.0;
+
+    vec3 nightColor = nightTexOn ? nightFactor * texture2D(nightTex, texCoords).rgb : vec3(0.0, 0.0, 0.0);
+    nightColor -= cloudsVal * 0.5; // clouds darken the night for 50%
+    
+    // shadow / facing away from the light source
+    if (ndotl <= 0.0) {
         return ambient + nightColor;
     }
 
-    vec3 diffuse = light.color * ndotl; // diffuse contribution
-    if (dayTexOn) {
-        diffuse *= dayFactor * texture2D(dayTex, texCoords).rgb;
-    } else {
-        diffuse *= material.diffuse;
-    }
+    // diffuse contribution
+    vec3 mat = dayTexOn ? dayFactor * texture2D(dayTex, texCoords).rgb : material.diffuse;
+    mat = mat * (1.0 - cloudsVal) + cloudsVal;
+    vec3 diffuse = mat * light.color * ndotl;
     
-    if (nightTexOn) { // dusk
+    // dusk
+    if (nightTexOn) {
         float angle = 90.0 - degrees(acos(ndotl));
         if (angle < duskAngle) {
             float f = angle / duskAngle;
