@@ -143,6 +143,7 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
             float f = angle / duskAngle;
             diffuse = nightColor * (1.0 - f) + diffuse * f;
         }
+        // diffuse = nightColor * (1.0 - pow(ndotl, 0.1)) + diffuse * pow(ndotl, 0.1); // Variante: Ueberblendung ueber die gesamte Halbkugel
     }
 
     // reflected light direction = perfect reflection direction
